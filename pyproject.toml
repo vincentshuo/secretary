@@ -1,0 +1,118 @@
+[project]
+name = "edison"
+version = "0.2.1"
+description = "Edison desktop workspace with YouTube reading and Curriculum"
+readme = "README.md"
+requires-python = ">=3.10,<3.13"
+license = { text = "MIT" }
+authors = [{ name = "vincentshuo" }]
+keywords = ["youtube", "subtitles", "ai", "outline", "bionic-reading", "terminal", "cli"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Multimedia :: Video",
+    "Topic :: Text Processing :: Linguistic",
+    "Typing :: Typed",
+]
+dependencies = [
+    "typer>=0.12",
+    "rich>=13.7",
+    "prompt_toolkit>=3.0.43",
+    "python-dotenv>=1,<2",
+    "openai>=1.30",
+    "anthropic>=0.40",
+    "google-genai>=1.3",
+    "markdown-it-py>=3.0",
+    "tomlkit>=0.12",
+    "platformdirs>=4.2",
+    "keyring>=25.0",
+    "tenacity>=8.2",
+    "google-auth>=2.23",
+    "textual>=1.0",
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.27",
+    "aisuite @ git+https://github.com/andrewyng/aisuite.git@1b4bbf303ec21968230b1ec869a144d054e9b3c4",
+    "docstring_parser",
+    "pyyaml>=6",
+    "pydantic>=2",
+    "mcp>=1.28.1,<2",
+    "httpx>=0.27",
+    "websockets>=13",
+    "ddgs>=9",
+    "croniter>=2",
+    "pypdf>=5",
+    "pypdfium2>=4",
+    "tzdata; sys_platform == 'win32'",
+    "tomli>=2; python_version < '3.11'",
+    "bcrypt>=4,<6",
+    "defusedxml>=0.7.1,<1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-mock>=3.12",
+    "pyte>=0.8",
+    "ruff>=0.4",
+    "mypy>=1.10",
+    "build>=1.0",
+    "twine>=5.0",
+    "pytest>=8",
+    "pytest-asyncio",
+    "httpx",
+]
+messaging = ["python-telegram-bot>=21", "slack-bolt>=1.18", "aiohttp>=3.9"]
+browser = ["playwright>=1.44"]
+bedrock = ["boto3>=1.34"]
+
+[project.urls]
+Homepage = "https://github.com/vincentshuo/Edison"
+Repository = "https://github.com/vincentshuo/Edison"
+Issues = "https://github.com/vincentshuo/Edison/issues"
+
+[project.scripts]
+openworker = "coworker.cli:main"
+openworker-server = "coworker.server.run:main"
+openworker-connectors = "coworker.connectors.cli:main"
+ocw = "coworker.teams.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["coworker"]
+
+[tool.hatch.build.targets.sdist]
+include = ["coworker", "packaging", "surfaces/gui", "stt", "LICENSE", "README.md", "docs/upstream", "scripts/daily_signal"]
+
+
+[tool.hatch.metadata]
+allow-direct-references = true
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+pythonpath = [".", "src"]
+asyncio_mode = "auto"
