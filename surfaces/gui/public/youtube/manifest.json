@@ -800,6 +800,42 @@
       "name": "Forbes",
       "documents": [
         {
+          "id": "Channel/Forbes/经营冰上迪士尼与怪兽卡车的全球家庭娱乐帝国 — Juliette Feld Grossman 精读报告.html",
+          "path": "Channel/Forbes/经营冰上迪士尼与怪兽卡车的全球家庭娱乐帝国 — Juliette Feld Grossman 精读报告.html",
+          "title": "经营冰上迪士尼与怪兽卡车的全球家庭娱乐帝国 — Juliette Feld Grossman 精读报告",
+          "sha256": "4f71834f45ef65ce40bb83972f6d1773afa6d98f8f2cf7cadba8f39db73390ed",
+          "modified": "2026-11-22T23:32:39",
+          "date": "2026.11.22",
+          "channel": "Forbes"
+        },
+        {
+          "id": "Channel/Forbes/四款头显，四种答案：2026 年的 VR 该怎么选 — Rebecca Isaacs 精读报告.html",
+          "path": "Channel/Forbes/四款头显，四种答案：2026 年的 VR 该怎么选 — Rebecca Isaacs 精读报告.html",
+          "title": "四款头显，四种答案：2026 年的 VR 该怎么选 — Rebecca Isaacs 精读报告",
+          "sha256": "4fd76a0ae3e8dc28e554cf06bcd60e53beefd82e9248cd46b8ab1abd55060516",
+          "modified": "2026-11-22T23:32:22",
+          "date": "2026.11.22",
+          "channel": "Forbes"
+        },
+        {
+          "id": "Channel/Forbes/在华尔街驾驭 AI 热潮 — Michal Katz 精读报告.html",
+          "path": "Channel/Forbes/在华尔街驾驭 AI 热潮 — Michal Katz 精读报告.html",
+          "title": "在华尔街驾驭 AI 热潮 — Michal Katz 精读报告",
+          "sha256": "2a1eb34b404d5220de57669772125f0eb3ad9336b06bc3f9df8b68ac5064c0cd",
+          "modified": "2026-11-22T23:32:16",
+          "date": "2026.11.22",
+          "channel": "Forbes"
+        },
+        {
+          "id": "Channel/Forbes/九岁逃离内战，归来把医疗送到最后一英里 — Forbes 精读报告.html",
+          "path": "Channel/Forbes/九岁逃离内战，归来把医疗送到最后一英里 — Forbes 精读报告.html",
+          "title": "九岁逃离内战，归来把医疗送到最后一英里 — Forbes 精读报告",
+          "sha256": "2a86abe97785bc34a368744594233328d400149b74b58e87359fd62e146fea9d",
+          "modified": "2026-11-22T23:32:05",
+          "date": "2026.11.22",
+          "channel": "Forbes"
+        },
+        {
           "id": "Channel/Forbes/从芭蕾舞教室到预测市场：Luana Lopes Lara 如何建成 Kalshi.html",
           "path": "Channel/Forbes/从芭蕾舞教室到预测市场：Luana Lopes Lara 如何建成 Kalshi.html",
           "title": "从芭蕾舞教室到预测市场：Luana Lopes Lara 如何建成 Kalshi",
@@ -2795,6 +2831,42 @@
       "name": "The Tonight Show Starring Jimmy Fallon",
       "documents": [
         {
+          "id": "Channel/The Tonight Show Starring Jimmy Fallon/火鸡、独轮车与一万分：卡尔金和加纳的猜词夜.html",
+          "path": "Channel/The Tonight Show Starring Jimmy Fallon/火鸡、独轮车与一万分：卡尔金和加纳的猜词夜.html",
+          "title": "火鸡、独轮车与一万分：卡尔金和加纳的猜词夜",
+          "sha256": "07719f4120100d7d5097f9d6b4a3c1e578c1917763d3592c036a1014c8a6a876",
+          "modified": "2026-11-22T23:33:13",
+          "date": "2026.11.22",
+          "channel": "The Tonight Show Starring Jimmy Fallon"
+        },
+        {
+          "id": "Channel/The Tonight Show Starring Jimmy Fallon/初恋是波切利，全家一起打恶作剧电话 — Julia Garner 精读报告.html",
+          "path": "Channel/The Tonight Show Starring Jimmy Fallon/初恋是波切利，全家一起打恶作剧电话 — Julia Garner 精读报告.html",
+          "title": "初恋是波切利，全家一起打恶作剧电话 — Julia Garner 精读报告",
+          "sha256": "c62f57407f74882aacec6103c67047de386dc39325adcfbce48e6221a46a8e3b",
+          "modified": "2026-11-22T23:33:03",
+          "date": "2026.11.22",
+          "channel": "The Tonight Show Starring Jimmy Fallon"
+        },
+        {
+          "id": "Channel/The Tonight Show Starring Jimmy Fallon/传闻先到，选角随后：基兰·卡尔金的三胎、怪癖与凯撒·弗里克曼 — The Tonight Show 精读报告.html",
+          "path": "Channel/The Tonight Show Starring Jimmy Fallon/传闻先到，选角随后：基兰·卡尔金的三胎、怪癖与凯撒·弗里克曼 — The Tonight Show 精读报告.html",
+          "title": "传闻先到，选角随后：基兰·卡尔金的三胎、怪癖与凯撒·弗里克曼 — The Tonight Show 精读报告",
+          "sha256": "9ff410fb718c42297e4247709de37d0eda8f4dc95f0505022d36e59d59fa5dfe",
+          "modified": "2026-11-22T23:32:55",
+          "date": "2026.11.22",
+          "channel": "The Tonight Show Starring Jimmy Fallon"
+        },
+        {
+          "id": "Channel/The Tonight Show Starring Jimmy Fallon/一个拥抱、一份炸鸡与一次停飞：法伦独白里的特朗普亚洲之行 — The Tonight Show 精读报告.html",
+          "path": "Channel/The Tonight Show Starring Jimmy Fallon/一个拥抱、一份炸鸡与一次停飞：法伦独白里的特朗普亚洲之行 — The Tonight Show 精读报告.html",
+          "title": "一个拥抱、一份炸鸡与一次停飞：法伦独白里的特朗普亚洲之行 — The Tonight Show 精读报告",
+          "sha256": "4c9e1e6321d6ae0e46d7fa3fb106a5c0df310315812c11321f6c17021ae00fda",
+          "modified": "2026-11-22T23:32:47",
+          "date": "2026.11.22",
+          "channel": "The Tonight Show Starring Jimmy Fallon"
+        },
+        {
           "id": "Channel/The Tonight Show Starring Jimmy Fallon/空巢之后再出发：詹妮弗·洛佩兹谈新音乐与 The JLO Show — The Tonight Show 精读报告.html",
           "path": "Channel/The Tonight Show Starring Jimmy Fallon/空巢之后再出发：詹妮弗·洛佩兹谈新音乐与 The JLO Show — The Tonight Show 精读报告.html",
           "title": "空巢之后再出发：詹妮弗·洛佩兹谈新音乐与 The JLO Show — The Tonight Show 精读报告",
@@ -2919,6 +2991,21 @@
           "modified": "2026-11-17T23:34:10",
           "date": "2026.11.17",
           "channel": "The Tonight Show Starring Jimmy Fallon"
+        }
+      ]
+    },
+    {
+      "id": "TheMinimalists",
+      "name": "TheMinimalists",
+      "documents": [
+        {
+          "id": "Channel/TheMinimalists/还剩 100 件：扔掉的不是东西，是情绪 — The Minimalists 精读报告.html",
+          "path": "Channel/TheMinimalists/还剩 100 件：扔掉的不是东西，是情绪 — The Minimalists 精读报告.html",
+          "title": "还剩 100 件：扔掉的不是东西，是情绪",
+          "sha256": "ea739e1c0bb6667af1f0ceebed90b28fcf6b556bffdce0add064fdcf87bc6772",
+          "modified": "2026-11-22T23:32:10",
+          "date": "2026.11.22",
+          "channel": "TheMinimalists"
         }
       ]
     },
