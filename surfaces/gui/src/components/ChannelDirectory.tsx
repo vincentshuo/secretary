@@ -11,8 +11,15 @@ export function ChannelDirectory({ selected, onSelect, onBack }: {
   const [failed, setFailed] = useState(false);
   useEffect(() => {
     const controller = new AbortController();
-    fetch("./youtube/manifest.json", { signal: controller.signal })
-      .then(response => { if (!response.ok) throw new Error(String(response.status)); return response.json(); })
+    async function load(url: string) {
+      const response = await fetch(url, { signal: controller.signal, cache: "no-cache" });
+      if (!response.ok) throw new Error(String(response.status));
+      return response.json();
+    }
+    const local = "./youtube/manifest.json";
+    const manifest = import.meta.env.DEV ? load(local) :
+      load("https://vincentshuo.github.io/secretary/youtube/manifest.json").catch(() => load(local));
+    manifest
       .then(data => setChannels(data.channels as Channel[]))
       .catch(() => { if (!controller.signal.aborted) setFailed(true); });
     return () => controller.abort();

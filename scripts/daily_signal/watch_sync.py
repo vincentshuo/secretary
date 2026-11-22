@@ -13,7 +13,7 @@ IGNORED_FILES = {'.watcher.log', '.watcher.error.log'}
 
 def snapshot():
     state = {}
-    for path in ROOT.rglob('*'):
+    for path in (ROOT / 'Channel').rglob('*'):
         if '.git' in path.parts or '__pycache__' in path.parts:
             continue
         if path.is_file() and path.name in IGNORED_FILES:
@@ -35,9 +35,13 @@ def sync():
     run('git', 'add', '.')
     if subprocess.run(['git', 'diff', '--cached', '--quiet', '--', '.'], cwd=ROOT).returncode != 0:
         run('git', 'commit', '--only', '-m', 'sync daily reading feed', '--', '.')
-    branch = subprocess.check_output(['git', 'branch', '--show-current'], cwd=ROOT, text=True).strip()
-    run('git', 'push', 'origin', branch)
-    run('python3', str(SCRIPTS / 'publish.py'))
+    run('git', 'fetch', 'origin', 'main')
+    try:
+        run('git', 'rebase', 'FETCH_HEAD')
+    except subprocess.CalledProcessError:
+        subprocess.run(['git', 'rebase', '--abort'], cwd=ROOT)
+        raise
+    run('git', 'push', 'origin', 'HEAD:refs/heads/main')
 
 print('daily-signal watcher running')
 last = snapshot(); changed_at = time.time()
@@ -49,7 +53,6 @@ while True:
     elif changed_at and time.time() - changed_at >= QUIET_SECONDS:
         try:
             sync(); print('synced', flush=True)
-            last = snapshot()
             changed_at = None
         except subprocess.CalledProcessError as exc:
             print(f'sync failed: {exc}', flush=True)

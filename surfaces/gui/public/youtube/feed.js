@@ -2,7 +2,7 @@ const list = document.querySelector("#documents");
 const channels = document.querySelector("#channels");
 const bulk = document.querySelector("#mark-all");
 const message = document.querySelector("#message");
-const publicRoot = new URL("https://vincentshuo.github.io/Edison/youtube/");
+const publicRoot = new URL("https://vincentshuo.github.io/secretary/youtube/");
 let reportRoot = new URL(".", location.href);
 let reports = [];
 let filter = "all";
@@ -132,7 +132,7 @@ window.addEventListener("message", event => {
   if (event.source === window.parent && event.data?.type === "edison-theme") applyTheme(event.data.theme);
 });
 async function loadManifest(root) {
-  const response = await fetch(new URL("manifest.json", root));
+  const response = await fetch(new URL("manifest.json", root), { cache: "no-cache" });
   if (!response.ok) throw new Error(String(response.status));
   return response.json();
 }
