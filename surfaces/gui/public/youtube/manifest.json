@@ -419,6 +419,15 @@
       "name": "Bloomberg Podcasts",
       "documents": [
         {
+          "id": "Channel/Bloomberg Podcasts/出钱的人说了不算：AI 巨头为何由创始人说了算 — Parmy Olson 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/出钱的人说了不算：AI 巨头为何由创始人说了算 — Parmy Olson 精读报告.html",
+          "title": "出钱的人说了不算：AI 巨头为何由创始人说了算 — Parmy Olson 精读报告",
+          "sha256": "ee0ae1a9597cda95631c04c49484e1ad1d02d47dca25cdc7752db4b6ef8dcb2a",
+          "modified": "2026-11-22T20:39:49",
+          "date": "2026.11.22",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
           "id": "Channel/Bloomberg Podcasts/财报周前夜：戴尔、迪尔与 Abercrombie 的三道考题 — Stock Movers 精读报告.html",
           "path": "Channel/Bloomberg Podcasts/财报周前夜：戴尔、迪尔与 Abercrombie 的三道考题 — Stock Movers 精读报告.html",
           "title": "财报周前夜：戴尔、迪尔与 Abercrombie 的三道考题 — Stock Movers 精读报告",
