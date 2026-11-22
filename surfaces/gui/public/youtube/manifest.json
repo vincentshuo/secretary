@@ -410,6 +410,15 @@
       "name": "Bloomberg Podcasts",
       "documents": [
         {
+          "id": "Channel/Bloomberg Podcasts/Anthropic 上市次日跌 12%：同一场周五直播的带广告完整版 — Bloomberg Intelligence 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/Anthropic 上市次日跌 12%：同一场周五直播的带广告完整版 — Bloomberg Intelligence 精读报告.html",
+          "title": "Anthropic 上市次日跌 12%：同一场周五直播的带广告完整版 — Bloomberg Intelligence 精读报告",
+          "sha256": "ef848d5a0caf01e285a11764c431e465ad393f97bf3275569a0ec91296e190e7",
+          "modified": "2026-11-22T13:34:57",
+          "date": "2026.11.22",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
           "id": "Channel/Bloomberg Podcasts/从英伟达财报到中国电动车，再到感恩节餐桌 — Businessweek 周末版精读报告.html",
           "path": "Channel/Bloomberg Podcasts/从英伟达财报到中国电动车，再到感恩节餐桌 — Businessweek 周末版精读报告.html",
           "title": "从英伟达财报到中国电动车，再到感恩节餐桌 — Businessweek 周末版精读报告",
