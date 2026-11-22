@@ -410,6 +410,24 @@
       "name": "Bloomberg Podcasts",
       "documents": [
         {
+          "id": "Channel/Bloomberg Podcasts/Anthropic 上市次日跌 12%：同一场周五直播的去广告版 — Bloomberg Money 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/Anthropic 上市次日跌 12%：同一场周五直播的去广告版 — Bloomberg Money 精读报告.html",
+          "title": "Anthropic 上市次日跌 12%：同一场周五直播的去广告版 — Bloomberg Money 精读报告",
+          "sha256": "37cfc30f9c2f2209fa121a2b34b32b959d63302753eb7ca517e1871759b0060e",
+          "modified": "2026-11-22T10:23:41",
+          "date": "2026.11.22",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
+          "id": "Channel/Bloomberg Podcasts/AI 重塑中国产业政策：自立优先，增长靠后 — Odd Lots 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/AI 重塑中国产业政策：自立优先，增长靠后 — Odd Lots 精读报告.html",
+          "title": "AI 重塑中国产业政策：自立优先，增长靠后 — Odd Lots 精读报告",
+          "sha256": "2e80ccc6940db451dfcbdfd770b7e9780bcbfa990df47c283b5acc549cc46501",
+          "modified": "2026-11-22T10:12:14",
+          "date": "2026.11.22",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
           "id": "Channel/Bloomberg Podcasts/Anthropic 上市次日跌 12%，AI 交易走到尽头了吗 — Bloomberg Money 精读报告.html",
           "path": "Channel/Bloomberg Podcasts/Anthropic 上市次日跌 12%，AI 交易走到尽头了吗 — Bloomberg Money 精读报告.html",
           "title": "Anthropic 上市次日跌 12%，AI 交易走到尽头了吗 — Bloomberg Money 精读报告",
@@ -424,6 +442,15 @@
       "id": "Chris Williamson",
       "name": "Chris Williamson",
       "documents": [
+        {
+          "id": "Channel/Chris Williamson/The Perfect Storm Reshaping The Global Economy - Steve Keen.html",
+          "path": "Channel/Chris Williamson/The Perfect Storm Reshaping The Global Economy - Steve Keen.html",
+          "title": "完美风暴正在重塑全球经济 — Steve Keen 精读报告",
+          "sha256": "fedc848c6aca772d8e0f6d50286c15e711b5b930d399d890877b3a83a88aaee6",
+          "modified": "2026-11-22T09:50:11",
+          "date": "2026.11.22",
+          "channel": "Chris Williamson"
+        },
         {
           "id": "Channel/Chris Williamson/Why The Media Tried To Destroy James Blunt.html",
           "path": "Channel/Chris Williamson/Why The Media Tried To Destroy James Blunt.html",
@@ -576,6 +603,21 @@
           "modified": "2026-11-17T21:34:01",
           "date": "2026.11.17",
           "channel": "Fashion Neurosis"
+        }
+      ]
+    },
+    {
+      "id": "Forbes",
+      "name": "Forbes",
+      "documents": [
+        {
+          "id": "Channel/Forbes/Inside Chase Auto's $93 Billion Network - Leslie Wims-Morris.html",
+          "path": "Channel/Forbes/Inside Chase Auto's $93 Billion Network - Leslie Wims-Morris.html",
+          "title": "一家银行如何连接一万四千家车商 — Leslie Wims-Morris 精读报告",
+          "sha256": "bf60f6a3de9e2cd73501fd7d2c11dc6231f116b6e30520e88cbe0d114b2d0970",
+          "modified": "2026-11-22T09:59:50",
+          "date": "2026.11.22",
+          "channel": "Forbes"
         }
       ]
     },
