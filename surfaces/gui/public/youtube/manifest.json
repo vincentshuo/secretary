@@ -53,6 +53,15 @@
       "name": "AI Engineer",
       "documents": [
         {
+          "id": "Channel/AI Engineer/local-ai-in-production-ahmad-osman.html",
+          "path": "Channel/AI Engineer/local-ai-in-production-ahmad-osman.html",
+          "title": "什么跑在哪：生产环境里的本地 AI — Ahmad Osman（Osmantic）精读报告",
+          "sha256": "44da30508c628b8a000d7223433e3e07035b6d1c2402144cdccad99db2247566",
+          "modified": "2026-11-22T19:35:03",
+          "date": "2026.11.22",
+          "channel": "AI Engineer"
+        },
+        {
           "id": "Channel/AI Engineer/engineer-your-coding-agents-zach-lloyd.html",
           "path": "Channel/AI Engineer/engineer-your-coding-agents-zach-lloyd.html",
           "title": "软件工程正在变成工厂工程 — Zach Lloyd（Warp）精读报告",
@@ -410,6 +419,69 @@
       "name": "Bloomberg Podcasts",
       "documents": [
         {
+          "id": "Channel/Bloomberg Podcasts/软件跟不上硬件：苹果的 Siri 困局与新掌舵 — Power On 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/软件跟不上硬件：苹果的 Siri 困局与新掌舵 — Power On 精读报告.html",
+          "title": "软件跟不上硬件：苹果的 Siri 困局与新掌舵 — Power On 精读报告",
+          "sha256": "156940b578848029cac30af17af6405aa5967f47f16f95a79eb00d435c581aea",
+          "modified": "2026-11-22T19:35:39",
+          "date": "2026.11.22",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
+          "id": "Channel/Bloomberg Podcasts/华尔街直面 AI 现实检验 — Bloomberg This Weekend 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/华尔街直面 AI 现实检验 — Bloomberg This Weekend 精读报告.html",
+          "title": "华尔街直面 AI 现实检验 — Bloomberg This Weekend 精读报告",
+          "sha256": "655d1254cb7a767be45f30ed476060aaecc77cccaaed1e29878e1c8ce6e16c68",
+          "modified": "2026-11-22T19:35:36",
+          "date": "2026.11.22",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
+          "id": "Channel/Bloomberg Podcasts/1982 年的战争仍在中东回响 — Bloomberg This Weekend 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/1982 年的战争仍在中东回响 — Bloomberg This Weekend 精读报告.html",
+          "title": "1982 年的战争仍在中东回响 — Bloomberg This Weekend 精读报告",
+          "sha256": "08dad7046abec849754baedc30b0b27a9dfe9798964d14f05b94cd5912c4d658",
+          "modified": "2026-11-22T19:35:23",
+          "date": "2026.11.22",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
+          "id": "Channel/Bloomberg Podcasts/合影载入史册，反弹已经开始 — Balance of Power 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/合影载入史册，反弹已经开始 — Balance of Power 精读报告.html",
+          "title": "合影载入史册，反弹已经开始 — Balance of Power 精读报告",
+          "sha256": "f728b2711b4486278822b4f8c3def9efd73203f9d25829378f928a962731027a",
+          "modified": "2026-11-22T19:35:14",
+          "date": "2026.11.22",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
+          "id": "Channel/Bloomberg Podcasts/感恩节晚餐正在搬进餐厅 — Bloomberg This Weekend 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/感恩节晚餐正在搬进餐厅 — Bloomberg This Weekend 精读报告.html",
+          "title": "感恩节晚餐正在搬进餐厅 — Bloomberg This Weekend 精读报告",
+          "sha256": "52149d2dc1853b4c6cd2f0dd17b4cf48e62d9a3cdd7355cb01ca8edd86683039",
+          "modified": "2026-11-22T19:35:10",
+          "date": "2026.11.22",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
+          "id": "Channel/Bloomberg Podcasts/感恩节前一周：通胀、预算与加息的三份答卷 — Bloomberg Daybreak Weekend 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/感恩节前一周：通胀、预算与加息的三份答卷 — Bloomberg Daybreak Weekend 精读报告.html",
+          "title": "感恩节前一周：通胀、预算与加息的三份答卷 — Bloomberg Daybreak Weekend 精读报告",
+          "sha256": "9ec773333636dd2e072f7d42eafcdf9311cda548b57551e72b1fad2a782674a6",
+          "modified": "2026-11-22T19:34:46",
+          "date": "2026.11.22",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
+          "id": "Channel/Bloomberg Podcasts/Anthropic 上市未能平息 AI 焦虑：抛售过头了 — Bloomberg This Weekend 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/Anthropic 上市未能平息 AI 焦虑：抛售过头了 — Bloomberg This Weekend 精读报告.html",
+          "title": "Anthropic 上市未能平息 AI 焦虑：抛售过头了 — Bloomberg This Weekend 精读报告",
+          "sha256": "e5834bea40768868b50ff8ea879155df5569534c2d851d1af77b09cadcf4ae80",
+          "modified": "2026-11-22T19:34:39",
+          "date": "2026.11.22",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
           "id": "Channel/Bloomberg Podcasts/债务、游戏、医保与网络安全：美国经济的四张账单 — Wall Street Week 精读报告.html",
           "path": "Channel/Bloomberg Podcasts/债务、游戏、医保与网络安全：美国经济的四张账单 — Wall Street Week 精读报告.html",
           "title": "债务、游戏、医保与网络安全：美国经济的四张账单 — Wall Street Week 精读报告",
@@ -520,6 +592,24 @@
       "id": "Closer To Truth",
       "name": "Closer To Truth",
       "documents": [
+        {
+          "id": "Channel/Closer To Truth/自然如何可能指向神 — C. Stephen Evans 精读报告.html",
+          "path": "Channel/Closer To Truth/自然如何可能指向神 — C. Stephen Evans 精读报告.html",
+          "title": "自然如何可能指向神 — C. Stephen Evans 精读报告",
+          "sha256": "ac03a40999a157efd79e5612dc6c45263418a557216648a93ea95f516c6a8e96",
+          "modified": "2026-11-22T19:34:56",
+          "date": "2026.11.22",
+          "channel": "Closer To Truth"
+        },
+        {
+          "id": "Channel/Closer To Truth/上帝为什么可能超出人类的理解 — Alex O'Connor 精读报告.html",
+          "path": "Channel/Closer To Truth/上帝为什么可能超出人类的理解 — Alex O'Connor 精读报告.html",
+          "title": "上帝为什么可能超出人类的理解 — Alex O'Connor 精读报告",
+          "sha256": "7b989e6c0a174fb1ebb915ab70643511b8dce3c4a808651060889d43255ec0cc",
+          "modified": "2026-11-22T19:34:49",
+          "date": "2026.11.22",
+          "channel": "Closer To Truth"
+        },
         {
           "id": "Channel/Closer To Truth/道德感是怎样进化出来的 — Nathan Lents 精读报告.html",
           "path": "Channel/Closer To Truth/道德感是怎样进化出来的 — Nathan Lents 精读报告.html",
@@ -647,6 +737,24 @@
       "name": "Forbes",
       "documents": [
         {
+          "id": "Channel/Forbes/美国梦的核心是接纳 — Ivan Poupyrev 精读报告.html",
+          "path": "Channel/Forbes/美国梦的核心是接纳 — Ivan Poupyrev 精读报告.html",
+          "title": "美国梦的核心是接纳 — Ivan Poupyrev 精读报告",
+          "sha256": "89068d5b43bf9b5a8be764d7c2b709b384f39a0299cd4ad2fab42da8976e5ba1",
+          "modified": "2026-11-22T19:34:32",
+          "date": "2026.11.22",
+          "channel": "Forbes"
+        },
+        {
+          "id": "Channel/Forbes/F1 车队估值狂飙：成本帽造就盈利新时代 — Forbes 精读报告.html",
+          "path": "Channel/Forbes/F1 车队估值狂飙：成本帽造就盈利新时代 — Forbes 精读报告.html",
+          "title": "F1 车队估值狂飙：成本帽造就盈利新时代 — Forbes 精读报告",
+          "sha256": "4d96e549187cd6541af4684e040a0769ad7fc393e67f939102aa44565db62961",
+          "modified": "2026-11-22T19:34:26",
+          "date": "2026.11.22",
+          "channel": "Forbes"
+        },
+        {
           "id": "Channel/Forbes/Inside Chase Auto's $93 Billion Network - Leslie Wims-Morris.html",
           "path": "Channel/Forbes/Inside Chase Auto's $93 Billion Network - Leslie Wims-Morris.html",
           "title": "一家银行如何连接一万四千家车商 — Leslie Wims-Morris 精读报告",
@@ -676,6 +784,15 @@
       "id": "GitHub",
       "name": "GitHub",
       "documents": [
+        {
+          "id": "Channel/GitHub/像造应用一样造操作系统 — Jorge Castro 精读报告.html",
+          "path": "Channel/GitHub/像造应用一样造操作系统 — Jorge Castro 精读报告.html",
+          "title": "像造应用一样造操作系统 — Jorge Castro 精读报告",
+          "sha256": "d6aa3f6acd85b348da2d5cd4f2dfcd76a77538a4c5b8ebc049b3a1fed5f7cbdd",
+          "modified": "2026-11-22T19:34:21",
+          "date": "2026.11.22",
+          "channel": "GitHub"
+        },
         {
           "id": "Channel/GitHub/Maria Victoria Gromysch - Building domain-specific AI agents for hardware reliability at NVIDIA.html",
           "path": "Channel/GitHub/Maria Victoria Gromysch - Building domain-specific AI agents for hardware reliability at NVIDIA.html",
@@ -754,6 +871,21 @@
       ]
     },
     {
+      "id": "Loïc Prigent",
+      "name": "Loïc Prigent",
+      "documents": [
+        {
+          "id": "Channel/Loïc Prigent/跟着鼻子过一天：调香师 Francis Kurkdjian 的巴黎 — Loïc Prigent 精读报告.html",
+          "path": "Channel/Loïc Prigent/跟着鼻子过一天：调香师 Francis Kurkdjian 的巴黎 — Loïc Prigent 精读报告.html",
+          "title": "跟着鼻子过一天：调香师 Francis Kurkdjian 的巴黎 — Loïc Prigent 精读报告",
+          "sha256": "b13ebed077568243e8bbd21ad4baaf1c781e000850f317c5fa1a05472c87a76c",
+          "modified": "2026-11-22T19:35:29",
+          "date": "2026.11.22",
+          "channel": "Loïc Prigent"
+        }
+      ]
+    },
+    {
       "id": "Masters of Scale",
       "name": "Masters of Scale",
       "documents": [
@@ -805,6 +937,15 @@
       "id": "Mel Robbins",
       "name": "Mel Robbins",
       "documents": [
+        {
+          "id": "Channel/Mel Robbins/在人前焦虑，先把声音拿回来 — Vinh Giang 现场辅导 精读报告.html",
+          "path": "Channel/Mel Robbins/在人前焦虑，先把声音拿回来 — Vinh Giang 现场辅导 精读报告.html",
+          "title": "在人前焦虑，先把声音拿回来 — Vinh Giang 现场辅导 精读报告",
+          "sha256": "b6b94b58920944762a9bd9078d801db51686f361b0aa315fbe8c27b7da5b86b3",
+          "modified": "2026-11-22T19:34:43",
+          "date": "2026.11.22",
+          "channel": "Mel Robbins"
+        },
         {
           "id": "Channel/Mel Robbins/说话清楚的 9 个习惯 — Vinh Giang 精读报告.html",
           "path": "Channel/Mel Robbins/说话清楚的 9 个习惯 — Vinh Giang 精读报告.html",
@@ -865,6 +1006,15 @@
       "id": "Peter Diamandis",
       "name": "Peter Diamandis",
       "documents": [
+        {
+          "id": "Channel/Peter Diamandis/Peter Diamandis - 把奇点上市：朱维特森的 SpaceX 豪赌与旅行者的一光日 EP314.html",
+          "path": "Channel/Peter Diamandis/Peter Diamandis - 把奇点上市：朱维特森的 SpaceX 豪赌与旅行者的一光日 EP314.html",
+          "title": "把奇点上市：朱维特森的 SpaceX 豪赌与旅行者的一光日 — Peter Diamandis（EP #314）精读报告",
+          "sha256": "eadc5a42096ec21b6dc88a231372a1c927b720421854e74c3d2ffad5c77ad784",
+          "modified": "2026-11-22T19:34:36",
+          "date": "2026.11.22",
+          "channel": "Peter Diamandis"
+        },
         {
           "id": "Channel/Peter Diamandis/Peter Diamandis - Anthropic 7200 万美元人均、FAA 停飞与星舰被接住 EP313.html",
           "path": "Channel/Peter Diamandis/Peter Diamandis - Anthropic 7200 万美元人均、FAA 停飞与星舰被接住 EP313.html",
@@ -1718,6 +1868,15 @@
       "name": "Soft White Underbelly",
       "documents": [
         {
+          "id": "Channel/Soft White Underbelly/我不是人类，我是地球人 — Jocelyn 精读报告.html",
+          "path": "Channel/Soft White Underbelly/我不是人类，我是地球人 — Jocelyn 精读报告.html",
+          "title": "我不是人类，我是地球人 — Jocelyn 精读报告",
+          "sha256": "011fd76c47d8f9463951be6388bbf47094c080fa48e9d66e2922a633ba3469de",
+          "modified": "2026-11-22T19:34:17",
+          "date": "2026.11.22",
+          "channel": "Soft White Underbelly"
+        },
+        {
           "id": "Channel/Soft White Underbelly/Catherine - A Childhood Not Worth Remembering.html",
           "path": "Channel/Soft White Underbelly/Catherine - A Childhood Not Worth Remembering.html",
           "title": "不值得记住的童年 — Catherine 精读报告",
@@ -1820,6 +1979,15 @@
       "name": "StarTalk",
       "documents": [
         {
+          "id": "Channel/StarTalk/长寿的打法：每天九分钟与食物即药 — Rhonda Patrick 精读报告.html",
+          "path": "Channel/StarTalk/长寿的打法：每天九分钟与食物即药 — Rhonda Patrick 精读报告.html",
+          "title": "长寿的打法：每天九分钟与食物即药 — Rhonda Patrick 精读报告",
+          "sha256": "a8a9e4d977e4ac5095225e3e2646b4207c9c0fa6719a70829b65b08d1e177427",
+          "modified": "2026-11-22T19:35:00",
+          "date": "2026.11.22",
+          "channel": "StarTalk"
+        },
+        {
           "id": "Channel/StarTalk/Janna Levin - Black Holes, In Theory….html",
           "path": "Channel/StarTalk/Janna Levin - Black Holes, In Theory….html",
           "title": "黑洞，理论上 — Janna Levin（StarTalk）精读报告",
@@ -1891,6 +2059,15 @@
       "id": "TED",
       "name": "TED",
       "documents": [
+        {
+          "id": "Channel/TED/伟大的艺术需要冒险 — Alex Van Halen、David Lee Roth 与 Robert Vargas 精读报告.html",
+          "path": "Channel/TED/伟大的艺术需要冒险 — Alex Van Halen、David Lee Roth 与 Robert Vargas 精读报告.html",
+          "title": "伟大的艺术需要冒险 — Alex Van Halen、David Lee Roth 与 Robert Vargas 精读报告",
+          "sha256": "892a6d94502180bf4313c636f4f1b183185e1eb46f36839853c6c261fb8db6a5",
+          "modified": "2026-11-22T19:35:19",
+          "date": "2026.11.22",
+          "channel": "TED"
+        },
         {
           "id": "Channel/TED/想让人改变？先换一个问题 — Philip Jameson 精读报告.html",
           "path": "Channel/TED/想让人改变？先换一个问题 — Philip Jameson 精读报告.html",
@@ -2446,6 +2623,21 @@
       ]
     },
     {
+      "id": "The Business of Fashion",
+      "name": "The Business of Fashion",
+      "documents": [
+        {
+          "id": "Channel/The Business of Fashion/读懂房间：Jacqui Hooper 两年从大学课堂走到时尚中心 — The BoF Podcast 精读报告.html",
+          "path": "Channel/The Business of Fashion/读懂房间：Jacqui Hooper 两年从大学课堂走到时尚中心 — The BoF Podcast 精读报告.html",
+          "title": "读懂房间：Jacqui Hooper 两年从大学课堂走到时尚中心 — The BoF Podcast 精读报告",
+          "sha256": "fa79ffb02d6d0b90f5f41afaa12a7d67aaac2d3e760610607ef35c9c7b80ec4e",
+          "modified": "2026-11-22T19:34:12",
+          "date": "2026.11.22",
+          "channel": "The Business of Fashion"
+        }
+      ]
+    },
+    {
       "id": "The Diary Of A CEO",
       "name": "The Diary Of A CEO",
       "documents": [
@@ -2503,6 +2695,15 @@
       "id": "The Tonight Show Starring Jimmy Fallon",
       "name": "The Tonight Show Starring Jimmy Fallon",
       "documents": [
+        {
+          "id": "Channel/The Tonight Show Starring Jimmy Fallon/空巢之后再出发：詹妮弗·洛佩兹谈新音乐与 The JLO Show — The Tonight Show 精读报告.html",
+          "path": "Channel/The Tonight Show Starring Jimmy Fallon/空巢之后再出发：詹妮弗·洛佩兹谈新音乐与 The JLO Show — The Tonight Show 精读报告.html",
+          "title": "空巢之后再出发：詹妮弗·洛佩兹谈新音乐与 The JLO Show — The Tonight Show 精读报告",
+          "sha256": "3f9dd2001e0e524d9f9ea4f694aa1c5d6887092f510ac5dd8ab6fe564aee26ac",
+          "modified": "2026-11-22T19:35:07",
+          "date": "2026.11.22",
+          "channel": "The Tonight Show Starring Jimmy Fallon"
+        },
         {
           "id": "Channel/The Tonight Show Starring Jimmy Fallon/pete-davidson-mob-wives.html",
           "path": "Channel/The Tonight Show Starring Jimmy Fallon/pete-davidson-mob-wives.html",
