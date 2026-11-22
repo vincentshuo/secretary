@@ -2120,6 +2120,15 @@
       "name": "Tessl",
       "documents": [
         {
+          "id": "Channel/Tessl/patrick-debois-multiplayer-factories.html",
+          "path": "Channel/Tessl/patrick-debois-multiplayer-factories.html",
+          "title": "多人软件工厂：并发交付的新难题 — Patrick Debois（Tessl）精读报告",
+          "sha256": "b28b1e4ff27f0c9cd304bb6cd55f180bc4fd80909b80d91d368ae9f1ffe4c5e1",
+          "modified": "2026-11-22T20:41:17",
+          "date": "2026.11.22",
+          "channel": "Tessl"
+        },
+        {
           "id": "Channel/Tessl/daniel-meppiel-bill-of-materials.html",
           "path": "Channel/Tessl/daniel-meppiel-bill-of-materials.html",
           "title": "软件工厂也得有物料清单 — Daniel Meppiel（Microsoft）精读报告",
