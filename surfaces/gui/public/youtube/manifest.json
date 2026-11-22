@@ -410,6 +410,15 @@
       "name": "Bloomberg Podcasts",
       "documents": [
         {
+          "id": "Channel/Bloomberg Podcasts/债务、游戏、医保与网络安全：美国经济的四张账单 — Wall Street Week 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/债务、游戏、医保与网络安全：美国经济的四张账单 — Wall Street Week 精读报告.html",
+          "title": "债务、游戏、医保与网络安全：美国经济的四张账单 — Wall Street Week 精读报告",
+          "sha256": "7abd8bf27637794269565fd92e268bc809118fe6e59eaa6c975bdbe755ab6986",
+          "modified": "2026-11-22T13:49:16",
+          "date": "2026.11.22",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
           "id": "Channel/Bloomberg Podcasts/Anthropic 上市次日跌 12%：同一场周五直播的带广告完整版 — Bloomberg Intelligence 精读报告.html",
           "path": "Channel/Bloomberg Podcasts/Anthropic 上市次日跌 12%：同一场周五直播的带广告完整版 — Bloomberg Intelligence 精读报告.html",
           "title": "Anthropic 上市次日跌 12%：同一场周五直播的带广告完整版 — Bloomberg Intelligence 精读报告",
