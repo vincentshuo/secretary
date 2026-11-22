@@ -737,6 +737,15 @@
       "name": "Forbes",
       "documents": [
         {
+          "id": "Channel/Forbes/83 美元敲开 1.5 万亿：Anthropic 上市造就的亿万富翁们 — Forbes 精读报告.html",
+          "path": "Channel/Forbes/83 美元敲开 1.5 万亿：Anthropic 上市造就的亿万富翁们 — Forbes 精读报告.html",
+          "title": "83 美元敲开 1.5 万亿：Anthropic 上市造就的亿万富翁们 — Forbes 精读报告",
+          "sha256": "7070f14c341fdc9c5fd9a8dd10ad913a6a29ca2902de732c8c41c8635a297b52",
+          "modified": "2026-11-22T20:32:23",
+          "date": "2026.11.22",
+          "channel": "Forbes"
+        },
+        {
           "id": "Channel/Forbes/美国梦的核心是接纳 — Ivan Poupyrev 精读报告.html",
           "path": "Channel/Forbes/美国梦的核心是接纳 — Ivan Poupyrev 精读报告.html",
           "title": "美国梦的核心是接纳 — Ivan Poupyrev 精读报告",
