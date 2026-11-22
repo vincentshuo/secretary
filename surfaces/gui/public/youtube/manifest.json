@@ -419,6 +419,51 @@
       "name": "Bloomberg Podcasts",
       "documents": [
         {
+          "id": "Channel/Bloomberg Podcasts/Anthropic 上市没能平息 AI 焦虑，感恩节却搬出了厨房 — Bloomberg This Weekend 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/Anthropic 上市没能平息 AI 焦虑，感恩节却搬出了厨房 — Bloomberg This Weekend 精读报告.html",
+          "title": "Anthropic 上市没能平息 AI 焦虑，感恩节却搬出了厨房 — Bloomberg This Weekend 精读报告",
+          "sha256": "ca7104f7a0f258806c1ee292873fb96379db1f64e2efddbc5a7e2121a771b8db",
+          "modified": "2026-11-22T20:52:21",
+          "date": "2026.11.22",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
+          "id": "Channel/Bloomberg Podcasts/六分钟竞猜：GTA、英伟达、韩国高考与一只紫兔子 — Pointed! 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/六分钟竞猜：GTA、英伟达、韩国高考与一只紫兔子 — Pointed! 精读报告.html",
+          "title": "六分钟竞猜：GTA、英伟达、韩国高考与一只紫兔子 — Pointed! 精读报告",
+          "sha256": "25ed14e78f701b61f9101f7cae26d939c3458977d131a97f9b8e46f06d5346ab",
+          "modified": "2026-11-22T20:52:17",
+          "date": "2026.11.22",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
+          "id": "Channel/Bloomberg Podcasts/AI 是不是泡沫？历史能给出什么线索 — Justin Fox 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/AI 是不是泡沫？历史能给出什么线索 — Justin Fox 精读报告.html",
+          "title": "AI 是不是泡沫？历史能给出什么线索 — Justin Fox 精读报告",
+          "sha256": "4405deb4f5e00cdae398d6e8f0ff595fb56c3d3a64ced3441bfd6ae2e03790b6",
+          "modified": "2026-11-22T20:52:14",
+          "date": "2026.11.22",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
+          "id": "Channel/Bloomberg Podcasts/特朗普接触普京考验乌克兰谈判 — Bloomberg This Weekend 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/特朗普接触普京考验乌克兰谈判 — Bloomberg This Weekend 精读报告.html",
+          "title": "特朗普接触普京考验乌克兰谈判 — Bloomberg This Weekend 精读报告",
+          "sha256": "4ad4c9288d85a2c48e44b6a5ed0cd2617a3164b6c34eb16f1449846eaa28a390",
+          "modified": "2026-11-22T20:52:10",
+          "date": "2026.11.22",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
+          "id": "Channel/Bloomberg Podcasts/深圳征服了科技，现在想要文化 — Bloomberg This Weekend 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/深圳征服了科技，现在想要文化 — Bloomberg This Weekend 精读报告.html",
+          "title": "深圳征服了科技，现在想要文化 — Bloomberg This Weekend 精读报告",
+          "sha256": "706a83380d51fa272bac7d92a5ee9cdb0e8be2ecefad14178544ac6ab4a2e552",
+          "modified": "2026-11-22T20:52:05",
+          "date": "2026.11.22",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
           "id": "Channel/Bloomberg Podcasts/出钱的人说了不算：AI 巨头为何由创始人说了算 — Parmy Olson 精读报告.html",
           "path": "Channel/Bloomberg Podcasts/出钱的人说了不算：AI 巨头为何由创始人说了算 — Parmy Olson 精读报告.html",
           "title": "出钱的人说了不算：AI 巨头为何由创始人说了算 — Parmy Olson 精读报告",
@@ -754,6 +799,15 @@
       "id": "Forbes",
       "name": "Forbes",
       "documents": [
+        {
+          "id": "Channel/Forbes/从芭蕾舞教室到预测市场：Luana Lopes Lara 如何建成 Kalshi.html",
+          "path": "Channel/Forbes/从芭蕾舞教室到预测市场：Luana Lopes Lara 如何建成 Kalshi.html",
+          "title": "从芭蕾舞教室到预测市场：Luana Lopes Lara 如何建成 Kalshi",
+          "sha256": "9c5c18b41187060fd743ad1b715e9f217c0dc7f25cbbec82cb2dbb8b3c72326f",
+          "modified": "2026-11-22T20:52:31",
+          "date": "2026.11.22",
+          "channel": "Forbes"
+        },
         {
           "id": "Channel/Forbes/83 美元敲开 1.5 万亿：Anthropic 上市造就的亿万富翁们 — Forbes 精读报告.html",
           "path": "Channel/Forbes/83 美元敲开 1.5 万亿：Anthropic 上市造就的亿万富翁们 — Forbes 精读报告.html",
