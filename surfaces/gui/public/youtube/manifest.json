@@ -410,6 +410,24 @@
       "name": "Bloomberg Podcasts",
       "documents": [
         {
+          "id": "Channel/Bloomberg Podcasts/从英伟达财报到中国电动车，再到感恩节餐桌 — Businessweek 周末版精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/从英伟达财报到中国电动车，再到感恩节餐桌 — Businessweek 周末版精读报告.html",
+          "title": "从英伟达财报到中国电动车，再到感恩节餐桌 — Businessweek 周末版精读报告",
+          "sha256": "d4cf4e3beef6b93912abf9b28e5c3eda2bf64e3da2ac2a90f697676e2986ebf1",
+          "modified": "2026-11-22T13:21:30",
+          "date": "2026.11.22",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
+          "id": "Channel/Bloomberg Podcasts/27 名跨性别军人的暂缓令，与国会调查权的边界 — Bloomberg Law 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/27 名跨性别军人的暂缓令，与国会调查权的边界 — Bloomberg Law 精读报告.html",
+          "title": "27 名跨性别军人的暂缓令，与国会调查权的边界 — Bloomberg Law 精读报告",
+          "sha256": "3906fe7d97dede8dcf35bc642a6aeb88cf11851b4daa2460a233eaed82c5bde0",
+          "modified": "2026-11-22T13:21:28",
+          "date": "2026.11.22",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
           "id": "Channel/Bloomberg Podcasts/Anthropic 上市次日跌 12%：同一场周五直播的去广告版 — Bloomberg Money 精读报告.html",
           "path": "Channel/Bloomberg Podcasts/Anthropic 上市次日跌 12%：同一场周五直播的去广告版 — Bloomberg Money 精读报告.html",
           "title": "Anthropic 上市次日跌 12%：同一场周五直播的去广告版 — Bloomberg Money 精读报告",
