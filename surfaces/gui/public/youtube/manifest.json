@@ -419,6 +419,15 @@
       "name": "Bloomberg Podcasts",
       "documents": [
         {
+          "id": "Channel/Bloomberg Podcasts/财报周前夜：戴尔、迪尔与 Abercrombie 的三道考题 — Stock Movers 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/财报周前夜：戴尔、迪尔与 Abercrombie 的三道考题 — Stock Movers 精读报告.html",
+          "title": "财报周前夜：戴尔、迪尔与 Abercrombie 的三道考题 — Stock Movers 精读报告",
+          "sha256": "58afc3e8dc71f828b2e9c3ac55dd5aeb719b9669887bbf6319af6f107e971dac",
+          "modified": "2026-11-22T20:38:31",
+          "date": "2026.11.22",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
           "id": "Channel/Bloomberg Podcasts/软件跟不上硬件：苹果的 Siri 困局与新掌舵 — Power On 精读报告.html",
           "path": "Channel/Bloomberg Podcasts/软件跟不上硬件：苹果的 Siri 困局与新掌舵 — Power On 精读报告.html",
           "title": "软件跟不上硬件：苹果的 Siri 困局与新掌舵 — Power On 精读报告",
