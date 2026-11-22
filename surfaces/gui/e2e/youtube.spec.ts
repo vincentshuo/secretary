@@ -1,4 +1,4 @@
-import { expect, test } from "./fixtures";
+import { expect, test } from "@playwright/test";
 
 test("YouTube opens the channel library and preserves reading selections", async ({page}) => {
   await page.goto("/");
