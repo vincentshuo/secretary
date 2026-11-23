@@ -1,6 +1,6 @@
 # Edison
 
-Edison's product language covers the YouTube reading workbench and Curriculum.
+Edison's product language covers the YouTube reading workbench, Curriculum and the Body profile.
 
 ## YouTube reading language
 
@@ -77,3 +77,37 @@ _Avoid_: External notification, proof of learning progress
 **Learning notification（学习通知）**:
 An optional notice outside the learning conversation that draws the person's attention to a learning message. It is independent of whether agents may create messages inside Edison.
 _Avoid_: Learning message, required reply
+
+## Body profile language
+
+**Body profile（身体档案）**:
+The personal module that records the 22 dimensions and target lengths kept by the clothing measurement guide and shows them on a fitted holographic body. It is a buying aid, not a medical scan or a full tailoring worksheet.
+_Avoid_: Body scan, 159-item record sheet, garment database
+
+**Recorded value（采用值）**:
+The single adopted reading of one item, in centimetres to 0.1, with its measuring position, posture and note. Paired items are recorded per side. A blank item is unmeasured, never zero.
+_Avoid_: Raw reading, average of attempts
+
+**Measurement draft（测量草稿）**:
+The editable set of recorded values, saved automatically. Editing the draft never creates history.
+_Avoid_: Snapshot, autosave history
+
+**Measurement snapshot（测量快照）**:
+A deliberately saved, dated set of recorded values. Correcting a snapshot keeps the replaced content as a revision; deleting it removes it for good.
+_Avoid_: Draft, automatic history entry
+
+**Holographic body（全息人体）**:
+The Anny body fitted to the recorded values and shown as a hologram. Items it does not measure are displayed as inferred values. It is a visual approximation, not a reconstruction of real cross-sections.
+_Avoid_: 3D scan, avatar
+
+**Inferred value（推断值）**:
+What the fitted body measures for an item the person has not recorded. It is shown dimmed and is never stored as a recorded value.
+_Avoid_: Default value, estimate entered by the person
+
+**Reference layer（参考层）**:
+A line drawn on the body for a target length, boot top or watch cuff. It never changes the body's shape.
+_Avoid_: Body dimension, garment size
+
+**Ghost comparison（幽灵对比）**:
+An earlier snapshot's fitted body overlaid on the current one, with the regions that changed glowing.
+_Avoid_: Before/after photo
