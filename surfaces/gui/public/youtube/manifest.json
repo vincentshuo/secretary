@@ -437,6 +437,15 @@
       "name": "Bloomberg Podcasts",
       "documents": [
         {
+          "id": "Channel/Bloomberg Podcasts/AI 抛售后的忐忑反弹、间谍调查与伊斯坦布尔的无票夺权 — Bloomberg Daybreak: Europe Edition 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/AI 抛售后的忐忑反弹、间谍调查与伊斯坦布尔的无票夺权 — Bloomberg Daybreak: Europe Edition 精读报告.html",
+          "title": "AI 抛售后的忐忑反弹、间谍调查与伊斯坦布尔的无票夺权 — Bloomberg Daybreak: Europe Edition 精读报告",
+          "sha256": "47902e8ecf57f35e9d2351f7710512fc40db3cf715e4adcf3dfcc6193be1677d",
+          "modified": "2026-11-23T23:46:54",
+          "date": "2026.11.23",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
           "id": "Channel/Bloomberg Podcasts/市场抛售之后，AI 股反弹 — Bloomberg News Now 精读报告.html",
           "path": "Channel/Bloomberg Podcasts/市场抛售之后，AI 股反弹 — Bloomberg News Now 精读报告.html",
           "title": "市场抛售之后，AI 股反弹 — Bloomberg News Now 精读报告",
