@@ -166,7 +166,7 @@ body {
 
 .app {
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: auto minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr); /* row fills viewport AND allows children to shrink */
   height: 100vh;
   overflow: hidden;
@@ -192,7 +192,6 @@ body {
   top: 0;
   bottom: 0;
   left: 0;
-  width: 300px;
   z-index: 60;
   transform: translateX(-100%);
   transition: transform 0.18s ease;
@@ -1727,7 +1726,7 @@ html[data-platform="linux"] ::-webkit-scrollbar-thumb:hover { background-color: 
 }
 
 /* -- BETA tag (quiet gray chip beside the wordmark; presentation-only, never in
-   bundle/artifact names — those feed the updater) --------------------------------- */
+   bundle/artifact names) ---------------------------------------------------------- */
 .beta-tag {
   display: inline-block;
   margin-left: 5px;
