@@ -61,6 +61,29 @@ def _attach(fn: Callable[..., Any], schema: dict[str, Any], *, approval: bool = 
     return fn
 
 
+def _with_chrome_fallback(launch: Any, *args: Any, **options: Any) -> Any:
+    try:
+        return launch(*args, **options)
+    except Exception as missing:
+        if "Executable doesn't exist" not in str(missing):
+            raise
+        try:
+            return launch(*args, channel="chrome", **options)
+        except Exception:
+            raise missing from None
+
+
+def launch_chromium(pw: Any, **options: Any) -> Any:
+    """Launch Playwright's Chromium, or the installed Google Chrome when the frozen app's
+    Playwright revision has no matching browser download on this Mac."""
+    return _with_chrome_fallback(pw.chromium.launch, **options)
+
+
+def launch_persistent_chromium(pw: Any, profile: str, **options: Any) -> Any:
+    """`launch_chromium` for a browser context that keeps its profile between launches."""
+    return _with_chrome_fallback(pw.chromium.launch_persistent_context, profile, **options)
+
+
 class _BrowserController:
     def __init__(self) -> None:
         self._lock = threading.RLock()
@@ -108,8 +131,8 @@ class _BrowserController:
     def _setup_error(self, exc: Exception) -> dict[str, str]:
         return {
             "error": (
-                "Interactive browser automation requires Playwright. Install it with "
-                "`pip install playwright` and `python -m playwright install chromium`."
+                "Interactive browser automation needs Google Chrome or Playwright's Chromium. "
+                "Install Chrome, or run `python -m playwright install chromium`."
             ),
             "details": str(exc),
         }
@@ -124,7 +147,7 @@ class _BrowserController:
                 from playwright.sync_api import sync_playwright
 
                 self._playwright = sync_playwright().start()
-                self._browser = self._playwright.chromium.launch(headless=False)
+                self._browser = launch_chromium(self._playwright, headless=False)
                 self._context = self._browser.new_context(
                     viewport={"width": 1280, "height": 900}
                 )

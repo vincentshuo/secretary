@@ -251,8 +251,10 @@ def _render_html_png(path: Path) -> bytes:
     Playwright chromium we already ship for the browser connector."""
     from playwright.sync_api import sync_playwright
 
+    from .browser_automation import launch_chromium
+
     with sync_playwright() as pw:
-        browser = pw.chromium.launch()
+        browser = launch_chromium(pw)
         try:
             page = browser.new_page(viewport={"width": 1280, "height": 800})
             page.goto(path.as_uri())
