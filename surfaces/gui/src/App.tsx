@@ -4,12 +4,14 @@ import { CurriculumView } from "./components/CurriculumView";
 import { CourseArchiveView } from "./components/curriculum/CourseArchiveView";
 import { shanghaiToday } from "./components/curriculum/timetable";
 import { Sidebar } from "./components/Sidebar";
+import { BodyView } from "./components/BodyView";
+import { getBodyStatus } from "./api";
 
-type Surface = "youtube" | "curriculum" | "curriculum-archive";
+export type Surface = "youtube" | "curriculum" | "curriculum-archive" | "body";
 
 function initialSurface(): Surface {
   const module = new URLSearchParams(location.search).get("module");
-  return module === "curriculum" || module === "curriculum-archive" ? module : "youtube";
+  return module === "curriculum" || module === "curriculum-archive" || module === "body" ? module : "youtube";
 }
 
 export function App() {
@@ -31,6 +33,10 @@ export function App() {
     window.history.replaceState(null, "", url);
   }, [surface, archiveDocument]);
 
+  useEffect(() => {
+    getBodyStatus().catch(() => {});
+  }, []);
+
   const openArchive = (id: string | null) => {
     setArchiveDocument(id);
     setSurface("curriculum-archive");
@@ -44,6 +50,7 @@ export function App() {
         onOpenYouTube={() => { setYoutubeChannel(""); setSurface("youtube"); }}
         onSelectChannel={(id) => { setYoutubeChannel(id); setSurface("youtube"); }}
         onOpenCurriculum={() => setSurface("curriculum")}
+        onOpenBody={() => setSurface("body")}
       />
       <main className="min-w-0 min-h-0 flex-1">
         {surface === "youtube" && <YouTubeView channel={youtubeChannel} />}
@@ -62,6 +69,7 @@ export function App() {
             onTimetable={() => setSurface("curriculum")}
           />
         )}
+        {surface === "body" && <BodyView />}
       </main>
     </div>
   );
