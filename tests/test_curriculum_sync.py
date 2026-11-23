@@ -17,6 +17,7 @@ from coworker.curriculum_sync import (
     AuthenticationRequired,
     archive_pass,
     collect,
+    edited_blocks_text,
     export_documents,
     fetch_json,
     generate_transcript,
@@ -311,6 +312,25 @@ def test_an_unavailable_model_stops_the_pass_and_keeps_lessons_queued(monkeypatc
     assert status["generation_error"] == MODEL_UNAVAILABLE and not status["errors"]
     assert len(calls) == 1 and store.recording("123")["state"] == "pending"
     assert store.sync_status("generation:123") == {}
+
+
+def test_a_broken_reply_is_split_and_a_preamble_is_ignored(monkeypatch, tmp_path):
+    store, item = setup(monkeypatch, tmp_path)
+    collect(store, now=NOW, fetch=platform_with(item))
+    calls = []
+
+    def complete(_model, messages, *args, **kwargs):
+        part = json.loads(messages[1]["content"])
+        calls.append(len(part))
+        if len(part) > 1:
+            return SimpleNamespace(text="not json at all", finish_reason="stop", tool_calls=[])
+        body = json.dumps([{"id": part[0]["id"], "text": part[0]["text"]}], ensure_ascii=False)
+        return SimpleNamespace(text="整理如下：\n" + body, finish_reason="stop", tool_calls=[])
+
+    manager = ready(SimpleNamespace(model="configured-host", provider_complete=complete))
+    doc = generate_transcript(store, "123", manager)
+    assert calls == [2, 1, 1] and "草图" in doc["markdown"]
+    assert edited_blocks_text('```json\n[{"id": 0}]\n```') == '[{"id": 0}]'
 
 
 def test_homework_export_is_published_locally_and_acknowledgements_drive_backup_state(monkeypatch, tmp_path):

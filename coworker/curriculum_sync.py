@@ -358,7 +358,7 @@ def _generate_transcript(store: CourseArchive, rid: str, manager: Any, *, regene
             if cached.get("model") == model:
                 return cached["blocks"]
         settings = {"max_tokens": 16000}
-        if model.startswith("ark-coding-plan-cn:"):
+        if model.startswith(("ark-coding-plan-cn:", "ark-agent-plan-cn:")):
             # This is editing, not a reasoning task. Keep the shared model/profile
             # unchanged; Ark's documented request-local flag disables deep thinking.
             settings.update(timeout=180, extra_body={"thinking": {"type": "disabled"}})
@@ -376,9 +376,16 @@ def _generate_transcript(store: CourseArchive, rid: str, manager: Any, *, regene
             return complete(part[:middle]) + complete(part[middle:])
         if turn.finish_reason not in {"stop", "end_turn"} or turn.tool_calls:
             raise ValueError("模型返回不完整，未发布整理稿")
-        text = (turn.text or "").strip()
-        text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text)
-        result = json.loads(text)
+        text = edited_blocks_text(turn.text)
+        try:
+            result = json.loads(text)
+        except json.JSONDecodeError:
+            # A batch the model cannot return intact is split, the same way an over-long
+            # reply is. A single block that still fails is a real rejection.
+            if len(part) > 1:
+                middle = len(part) // 2
+                return complete(part[:middle]) + complete(part[middle:])
+            raise
         if not isinstance(result, list) or [b.get("id") for b in result] != [b["id"] for b in part]:
             raise ValueError("整理稿遗漏或重排时间块，未发布")
         if any(not isinstance(b.get("text"), str) for b in result):
@@ -428,6 +435,14 @@ def _generate_transcript(store: CourseArchive, rid: str, manager: Any, *, regene
 
 
 MODEL_UNAVAILABLE = "Edison 文字模型不可用（凭据或订阅失效），请在设置中更新；待整理课次保留"
+
+
+def edited_blocks_text(text: str) -> str:
+    """The JSON array inside a model's reply, dropping a code fence or a short preamble."""
+    text = (text or "").strip()
+    text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text)
+    start, end = text.find("["), text.rfind("]")
+    return text[start : end + 1] if 0 <= start < end else text
 
 
 def model_unavailable(exc: Exception) -> bool:

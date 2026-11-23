@@ -13,7 +13,7 @@
 - `coworker/curriculum.py` 延用 SQLite 归档，记录运行与备份状态，提供当前稿和可选择的历史版本。档案位于桌面应用状态目录的 `curriculum/`。
 - 平台自 2026-11-17 起拒绝匿名请求（`401 未获取到用户信息`），并会周期性要求重新认证。学校统一认证只能由本人手机扫码，`coworker/curriculum_login.py` 因此在 Edison 自己的浏览器档案 `curriculum/platform-browser/` 中完成登录，只把平台域名的 Cookie 存入私有文件 `curriculum/platform-session.json`；不读取用户日常浏览器，不保存账号密码。会话过期时先用档案内统一认证的长期票据无窗口续期，失败才在课程档案页提示“扫码登录”，扫码后立即补跑一轮。登录过期作为 `auth_required` 单独呈现，不混入课程错误；因登录受阻的课次在下一轮直接复查。
 - `coworker/curriculum_sync.py` 携带该会话读取授权课程目录与字幕，只保存安全目录元数据。按约九十秒来源块整理，校验所有块身份与顺序、完整返回及粗略长度，防止漏块、截断和明显概括。保真仍需要来源核对，自动校验不证明语义逐字正确。
-- 整理复用 Edison 当前模型与凭据；Ark Coding Plan 的本次编辑请求单独关闭深度思考并设置超时，不改共享模型配置。依据：[官方 Coding Plan 文档](https://docs.volcengine.com/docs/ark/coding-plan-personal-ai-claude-code?lang=zh)。
+- 整理复用 Edison 当前模型与凭据；Ark Coding Plan 与 Agent Plan 的本次编辑请求单独关闭深度思考并设置超时（2026-11-23 实测 Agent Plan 的 doubao-seed-evolving 接受该参数），不改共享模型配置。依据：[官方 Coding Plan 文档](https://docs.volcengine.com/docs/ark/coding-plan-personal-ai-claude-code?lang=zh)。
 - `archive_pass` 是一次有限运行：归档进程锁防止重叠，每课次生成锁协调手动整理与定时整理，单轮默认最多四次课堂，只有确实有待整理课次时才加载模型。已启用自动检查的档案在应用运行期间由 sidecar 每十五分钟执行一轮，启动后一分钟先补一轮；新档案保持空闲。`scripts/sync_classrooms.py` 手动执行同一轮次，历史回填另用有限批次。
 - 每轮结束后，`publish_export` 把与阅读器相同的 Markdown 写入私有文件 `curriculum/homework-export.json`，并读取 `homework-ack.json` 中的备份确认。不导出原文、数据库、媒体地址或日志。
 - Homework 的具名小程序沿用系统文件夹选择窗口取得的 Homework 授权，每五分钟读取本地导出，验证路径与内容后原子写入，人工修改另存 incoming 副本，再写回确认。不自动删除本地资料、不运行 Git。裸后台 Python 曾被 macOS 的桌面隐私保护拒绝，因此写入 Homework 的仍是这个获授权的小程序。依据：[Apple NSOpenPanel](https://developer.apple.com/documentation/appkit/nsopenpanel)。
