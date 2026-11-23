@@ -437,6 +437,15 @@
       "name": "Bloomberg Podcasts",
       "documents": [
         {
+          "id": "Channel/Bloomberg Podcasts/一个 vibecoder 小镇折射的中国经济 — Odd Lots 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/一个 vibecoder 小镇折射的中国经济 — Odd Lots 精读报告.html",
+          "title": "一个 vibecoder 小镇折射的中国经济 — Odd Lots 精读报告",
+          "sha256": "ae09b4be224a931c58d335612c4ec2100ea828c1377921d5f551551769382ab8",
+          "modified": "2026-11-23T21:30:12",
+          "date": "2026.11.23",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
           "id": "Channel/Bloomberg Podcasts/英国经济悲观过头了吗 — Bruna Skarica 精读报告.html",
           "path": "Channel/Bloomberg Podcasts/英国经济悲观过头了吗 — Bruna Skarica 精读报告.html",
           "title": "英国经济悲观过头了吗 — Bruna Skarica 精读报告",
