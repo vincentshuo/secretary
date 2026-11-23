@@ -53,6 +53,15 @@
       "name": "AI Engineer",
       "documents": [
         {
+          "id": "Channel/AI Engineer/先建作坊，再建工厂 — Armin Ronacher 精读报告.html",
+          "path": "Channel/AI Engineer/先建作坊，再建工厂 — Armin Ronacher 精读报告.html",
+          "title": "先建作坊，再建工厂 — Armin Ronacher 精读报告",
+          "sha256": "4929dcdf79ffc4877d3813d6819e967786dcf707f7cfa7375a778453c0a2b964",
+          "modified": "2026-11-23T19:32:25",
+          "date": "2026.11.23",
+          "channel": "AI Engineer"
+        },
+        {
           "id": "Channel/AI Engineer/local-ai-in-production-ahmad-osman.html",
           "path": "Channel/AI Engineer/local-ai-in-production-ahmad-osman.html",
           "title": "什么跑在哪：生产环境里的本地 AI — Ahmad Osman（Osmantic）精读报告",
@@ -419,6 +428,114 @@
       "name": "Bloomberg Podcasts",
       "documents": [
         {
+          "id": "Channel/Bloomberg Podcasts/英国经济悲观过头了吗 — Bruna Skarica 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/英国经济悲观过头了吗 — Bruna Skarica 精读报告.html",
+          "title": "英国经济悲观过头了吗 — Bruna Skarica 精读报告",
+          "sha256": "b05a297b052009066fbc1c3e52401065bdb88092739ccad056e208e89042a30e",
+          "modified": "2026-11-23T19:33:48",
+          "date": "2026.11.23",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
+          "id": "Channel/Bloomberg Podcasts/反弹来了，抛售还没走：美股修正与文远知行财报 — Bloomberg Daybreak: Asia Edition 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/反弹来了，抛售还没走：美股修正与文远知行财报 — Bloomberg Daybreak: Asia Edition 精读报告.html",
+          "title": "反弹来了，抛售还没走：美股修正与文远知行财报 — Bloomberg Daybreak: Asia Edition 精读报告",
+          "sha256": "7c695b176fdc6d82b8b37159e9f496c081569d5282560344c5e515c02da5782c",
+          "modified": "2026-11-23T19:33:44",
+          "date": "2026.11.23",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
+          "id": "Channel/Bloomberg Podcasts/一款游戏如何\"请假\"了整个感恩节 — GTA Takes Over Thanksgiving Week 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/一款游戏如何\"请假\"了整个感恩节 — GTA Takes Over Thanksgiving Week 精读报告.html",
+          "title": "一款游戏如何\"请假\"了整个感恩节 — GTA Takes Over Thanksgiving Week 精读报告",
+          "sha256": "58990452df38fa3a1cc8b815bb5f0cd6e0e1e19b5e0cb212a25d62f694cdcdfe",
+          "modified": "2026-11-23T19:33:19",
+          "date": "2026.11.23",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
+          "id": "Channel/Bloomberg Podcasts/蓝潮之后，两党都在盘算 2028 — Democrats, Republicans Eye the 2028 Presidential Field 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/蓝潮之后，两党都在盘算 2028 — Democrats, Republicans Eye the 2028 Presidential Field 精读报告.html",
+          "title": "蓝潮之后，两党都在盘算 2028 — Democrats, Republicans Eye the 2028 Presidential Field 精读报告",
+          "sha256": "a7457e7e0e2bbfe9c3e6ddd6e2e48392c473c395f71c8b328ca27540f79d1ab1",
+          "modified": "2026-11-23T19:33:14",
+          "date": "2026.11.23",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
+          "id": "Channel/Bloomberg Podcasts/一份游戏合同、一个\"免费\"姐姐与新任 007 — By The Way 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/一份游戏合同、一个\"免费\"姐姐与新任 007 — By The Way 精读报告.html",
+          "title": "一份游戏合同、一个\"免费\"姐姐与新任 007 — By The Way 精读报告",
+          "sha256": "ac2e7f25d381691c730c7b1cee2c9ab2f5fb6c7f713ed1334e0f40a1bbf42431",
+          "modified": "2026-11-23T19:33:10",
+          "date": "2026.11.23",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
+          "id": "Channel/Bloomberg Podcasts/大脚怪的纸面记录、GTA 的油价与一只洋葱的账单 — Bookmarked 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/大脚怪的纸面记录、GTA 的油价与一只洋葱的账单 — Bookmarked 精读报告.html",
+          "title": "大脚怪的纸面记录、GTA 的油价与一只洋葱的账单 — Bookmarked 精读报告",
+          "sha256": "6df8723df138eaa63a84cae90f682f94e6aadaea939ea8f79859d7aacafdf13d",
+          "modified": "2026-11-23T19:33:06",
+          "date": "2026.11.23",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
+          "id": "Channel/Bloomberg Podcasts/麦考尔追问黄仁勋：芯片、间谍与“朋友” — Bloomberg This Weekend 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/麦考尔追问黄仁勋：芯片、间谍与“朋友” — Bloomberg This Weekend 精读报告.html",
+          "title": "麦考尔追问黄仁勋：芯片、间谍与“朋友” — Bloomberg This Weekend 精读报告",
+          "sha256": "addc7494bd5580af884592094e256b528d4ec1c3a2c375afcef146bbcf99e6ad",
+          "modified": "2026-11-23T19:32:47",
+          "date": "2026.11.23",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
+          "id": "Channel/Bloomberg Podcasts/离治愈还有多远 — David Cameron 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/离治愈还有多远 — David Cameron 精读报告.html",
+          "title": "离治愈还有多远 — David Cameron 精读报告",
+          "sha256": "7ab66c39f73fa0232d73599a7c2f9a1130330968a2b2483daf8ea6d38c02ce92",
+          "modified": "2026-11-23T19:32:34",
+          "date": "2026.11.23",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
+          "id": "Channel/Bloomberg Podcasts/特朗普试探与民主党的共同点 — Hadriana Lowenkron 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/特朗普试探与民主党的共同点 — Hadriana Lowenkron 精读报告.html",
+          "title": "特朗普试探与民主党的共同点 — Hadriana Lowenkron 精读报告",
+          "sha256": "72c28ebda018dd6b86300b30db90d7b28ce791d8d9014fd199104ca193c10353",
+          "modified": "2026-11-23T19:32:15",
+          "date": "2026.11.23",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
+          "id": "Channel/Bloomberg Podcasts/AI 焦虑的一周 — Bloomberg This Weekend 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/AI 焦虑的一周 — Bloomberg This Weekend 精读报告.html",
+          "title": "AI 焦虑的一周 — Bloomberg This Weekend 精读报告",
+          "sha256": "1d597de1bc385008e3983538604c5fb0fe2e8cceeab4a354234c1dc908f74528",
+          "modified": "2026-11-23T19:32:09",
+          "date": "2026.11.23",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
+          "id": "Channel/Bloomberg Podcasts/十月没加息是个错误 — Neil Dutta 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/十月没加息是个错误 — Neil Dutta 精读报告.html",
+          "title": "十月没加息是个错误 — Neil Dutta 精读报告",
+          "sha256": "eda30348479fbefdc7716afd34892b76975d8c1c75f7a75f1ad09be2abd4a88c",
+          "modified": "2026-11-23T19:31:59",
+          "date": "2026.11.23",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
+          "id": "Channel/Bloomberg Podcasts/拉姆·伊曼纽尔：特朗普正在正中中国下怀 — Bloomberg This Weekend 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/拉姆·伊曼纽尔：特朗普正在正中中国下怀 — Bloomberg This Weekend 精读报告.html",
+          "title": "拉姆·伊曼纽尔：特朗普正在正中中国下怀 — Bloomberg This Weekend 精读报告",
+          "sha256": "b7d0df3bfb6293e6d9cf44cce096ea410053522630e847d591113b1f1774cbf1",
+          "modified": "2026-11-23T19:31:04",
+          "date": "2026.11.23",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
           "id": "Channel/Bloomberg Podcasts/Anthropic 上市没能平息 AI 焦虑，感恩节却搬出了厨房 — Bloomberg This Weekend 精读报告.html",
           "path": "Channel/Bloomberg Podcasts/Anthropic 上市没能平息 AI 焦虑，感恩节却搬出了厨房 — Bloomberg This Weekend 精读报告.html",
           "title": "Anthropic 上市没能平息 AI 焦虑，感恩节却搬出了厨房 — Bloomberg This Weekend 精读报告",
@@ -614,6 +731,15 @@
       "name": "Chris Williamson",
       "documents": [
         {
+          "id": "Channel/Chris Williamson/The Biggest Hole In The Atheist Argument - Alex O’Connor.html",
+          "path": "Channel/Chris Williamson/The Biggest Hole In The Atheist Argument - Alex O’Connor.html",
+          "title": "无神论论证最大的漏洞：意识 — Alex O’Connor 精读报告",
+          "sha256": "488824b80262b1922ed9835217fc5e252c01a5b75407e9abba024ac9b826e3a4",
+          "modified": "2026-11-23T19:31:32",
+          "date": "2026.11.23",
+          "channel": "Chris Williamson"
+        },
+        {
           "id": "Channel/Chris Williamson/The Perfect Storm Reshaping The Global Economy - Steve Keen.html",
           "path": "Channel/Chris Williamson/The Perfect Storm Reshaping The Global Economy - Steve Keen.html",
           "title": "完美风暴正在重塑全球经济 — Steve Keen 精读报告",
@@ -655,6 +781,24 @@
       "id": "Closer To Truth",
       "name": "Closer To Truth",
       "documents": [
+        {
+          "id": "Channel/Closer To Truth/宇宙论论证为何打动不了我 — William Dembski 精读报告.html",
+          "path": "Channel/Closer To Truth/宇宙论论证为何打动不了我 — William Dembski 精读报告.html",
+          "title": "宇宙论论证为何打动不了我 — William Dembski 精读报告",
+          "sha256": "285a6ba3833f09f87936138e46449920ec1414b4c23077c2e8f34567f86e0861",
+          "modified": "2026-11-23T19:31:19",
+          "date": "2026.11.23",
+          "channel": "Closer To Truth"
+        },
+        {
+          "id": "Channel/Closer To Truth/谁是体验意识的那一个 — Acharya Prashant 精读报告.html",
+          "path": "Channel/Closer To Truth/谁是体验意识的那一个 — Acharya Prashant 精读报告.html",
+          "title": "谁是体验意识的那一个 — Acharya Prashant 精读报告",
+          "sha256": "7df4b41b7c04e22113a66e71fa31f68e7a41f68284326f1b9aa2fc425c20e244",
+          "modified": "2026-11-23T19:31:16",
+          "date": "2026.11.23",
+          "channel": "Closer To Truth"
+        },
         {
           "id": "Channel/Closer To Truth/自然如何可能指向神 — C. Stephen Evans 精读报告.html",
           "path": "Channel/Closer To Truth/自然如何可能指向神 — C. Stephen Evans 精读报告.html",
@@ -800,6 +944,33 @@
       "name": "Forbes",
       "documents": [
         {
+          "id": "Channel/Forbes/不必是外向者，也能当 CMO — Tinder 全球首席营销官 Melissa Hobley 精读报告.html",
+          "path": "Channel/Forbes/不必是外向者，也能当 CMO — Tinder 全球首席营销官 Melissa Hobley 精读报告.html",
+          "title": "不必是外向者，也能当 CMO — Tinder 全球首席营销官 Melissa Hobley 精读报告",
+          "sha256": "8fd6bcd7fc2a7c667ab055ba4c7d2efd3c731ebbdf7d1884f70862e96fdd141e",
+          "modified": "2026-11-23T19:32:58",
+          "date": "2026.11.23",
+          "channel": "Forbes"
+        },
+        {
+          "id": "Channel/Forbes/从一个卢布到亿万富翁 — Igor Tulchinsky 精读报告.html",
+          "path": "Channel/Forbes/从一个卢布到亿万富翁 — Igor Tulchinsky 精读报告.html",
+          "title": "从一个卢布到亿万富翁 — Igor Tulchinsky 精读报告",
+          "sha256": "0c967ccc511e25923411a76606aaf0d818f4790982b339d053323a7bf08c2b65",
+          "modified": "2026-11-23T19:32:53",
+          "date": "2026.11.23",
+          "channel": "Forbes"
+        },
+        {
+          "id": "Channel/Forbes/居家爸爸的贝果爱好如何做成 4600 万美元生意 — Jeff Perera 精读报告.html",
+          "path": "Channel/Forbes/居家爸爸的贝果爱好如何做成 4600 万美元生意 — Jeff Perera 精读报告.html",
+          "title": "居家爸爸的贝果爱好如何做成 4600 万美元生意 — Jeff Perera 精读报告",
+          "sha256": "3e07f41bdfc7af105ba52e557cb6b5c0baa3653ba5f6a6548cec2c9c5a738924",
+          "modified": "2026-11-23T19:31:48",
+          "date": "2026.11.23",
+          "channel": "Forbes"
+        },
+        {
           "id": "Channel/Forbes/经营冰上迪士尼与怪兽卡车的全球家庭娱乐帝国 — Juliette Feld Grossman 精读报告.html",
           "path": "Channel/Forbes/经营冰上迪士尼与怪兽卡车的全球家庭娱乐帝国 — Juliette Feld Grossman 精读报告.html",
           "title": "经营冰上迪士尼与怪兽卡车的全球家庭娱乐帝国 — Juliette Feld Grossman 精读报告",
@@ -887,6 +1058,15 @@
       "name": "Founders",
       "documents": [
         {
+          "id": "Channel/Founders/Tobi Lütke - Why Founders Are Irreplaceable.html",
+          "path": "Channel/Founders/Tobi Lütke - Why Founders Are Irreplaceable.html",
+          "title": "创始人没有接班人 — Tobi Lütke 精读报告",
+          "sha256": "a481a1137a66e13679f530726be7e7fd579493335a13f2dcb1a119f305d8b4b6",
+          "modified": "2026-11-23T19:31:09",
+          "date": "2026.11.23",
+          "channel": "Founders"
+        },
+        {
           "id": "Channel/Founders/Brian Armstrong - Why Now Is The Golden Age of Building.html",
           "path": "Channel/Founders/Brian Armstrong - Why Now Is The Golden Age of Building.html",
           "title": "现在正是建造的黄金时代 — Brian Armstrong 精读报告",
@@ -901,6 +1081,15 @@
       "id": "GitHub",
       "name": "GitHub",
       "documents": [
+        {
+          "id": "Channel/GitHub/让 AI 自己找活干 — Cameron Hamilton 精读报告.html",
+          "path": "Channel/GitHub/让 AI 自己找活干 — Cameron Hamilton 精读报告.html",
+          "title": "让 AI 自己找活干 — Cameron Hamilton 精读报告",
+          "sha256": "d2a552358b58673e71cc97bb0db5dd73a139efc58a14bbad98f1761d903d0c1f",
+          "modified": "2026-11-23T19:31:40",
+          "date": "2026.11.23",
+          "channel": "GitHub"
+        },
         {
           "id": "Channel/GitHub/像造应用一样造操作系统 — Jorge Castro 精读报告.html",
           "path": "Channel/GitHub/像造应用一样造操作系统 — Jorge Castro 精读报告.html",
@@ -984,6 +1173,21 @@
           "modified": "2026-11-19T21:15:24",
           "date": "2026.11.19",
           "channel": "Joe Rogan"
+        }
+      ]
+    },
+    {
+      "id": "Lenny's Podcast",
+      "name": "Lenny's Podcast",
+      "documents": [
+        {
+          "id": "Channel/Lenny's Podcast/掌舵，别划桨 — Sherif Mansour 精读报告.html",
+          "path": "Channel/Lenny's Podcast/掌舵，别划桨 — Sherif Mansour 精读报告.html",
+          "title": "掌舵，别划桨 — Sherif Mansour 精读报告",
+          "sha256": "f4083d5c66c202ad436a6e9f1ac5e7520346413af618e2d50cb4eebfbba1f762",
+          "modified": "2026-11-23T19:31:27",
+          "date": "2026.11.23",
+          "channel": "Lenny's Podcast"
         }
       ]
     },
@@ -2830,6 +3034,51 @@
       "id": "The Tonight Show Starring Jimmy Fallon",
       "name": "The Tonight Show Starring Jimmy Fallon",
       "documents": [
+        {
+          "id": "Channel/The Tonight Show Starring Jimmy Fallon/特朗普谈断电：“这就是生活”，又盼与金正恩会面.html",
+          "path": "Channel/The Tonight Show Starring Jimmy Fallon/特朗普谈断电：“这就是生活”，又盼与金正恩会面.html",
+          "title": "特朗普谈断电：“这就是生活”，又盼与金正恩会面",
+          "sha256": "e37c5216dc0e2d119e976a374ba62cca997f6eca80843db0c8e2bb21233d2f97",
+          "modified": "2026-11-23T19:33:40",
+          "date": "2026.11.23",
+          "channel": "The Tonight Show Starring Jimmy Fallon"
+        },
+        {
+          "id": "Channel/The Tonight Show Starring Jimmy Fallon/马刺、鸽子与一首麻雀之歌.html",
+          "path": "Channel/The Tonight Show Starring Jimmy Fallon/马刺、鸽子与一首麻雀之歌.html",
+          "title": "马刺、鸽子与一首麻雀之歌",
+          "sha256": "ddecfc896906bb42c5b6e757caec08043358f264e1155a361ea1d35f1c0a9b6c",
+          "modified": "2026-11-23T19:33:35",
+          "date": "2026.11.23",
+          "channel": "The Tonight Show Starring Jimmy Fallon"
+        },
+        {
+          "id": "Channel/The Tonight Show Starring Jimmy Fallon/杜松子酒、艾美奖与玛戈·班克斯.html",
+          "path": "Channel/The Tonight Show Starring Jimmy Fallon/杜松子酒、艾美奖与玛戈·班克斯.html",
+          "title": "杜松子酒、艾美奖与玛戈·班克斯",
+          "sha256": "9e96c4fd20cc14cd3a1f3eda3850432bd8ee6a38b85c750b361132a5de657516",
+          "modified": "2026-11-23T19:33:31",
+          "date": "2026.11.23",
+          "channel": "The Tonight Show Starring Jimmy Fallon"
+        },
+        {
+          "id": "Channel/The Tonight Show Starring Jimmy Fallon/新房主、灶台水龙头与门口那双男靴.html",
+          "path": "Channel/The Tonight Show Starring Jimmy Fallon/新房主、灶台水龙头与门口那双男靴.html",
+          "title": "新房主、灶台水龙头与门口那双男靴",
+          "sha256": "a13c39e6a94d205318604021f7f3db290a452725dfc9771e5fc506277d2b52fe",
+          "modified": "2026-11-23T19:33:27",
+          "date": "2026.11.23",
+          "channel": "The Tonight Show Starring Jimmy Fallon"
+        },
+        {
+          "id": "Channel/The Tonight Show Starring Jimmy Fallon/夺冠之夜、七步意面与紫雨俱乐部.html",
+          "path": "Channel/The Tonight Show Starring Jimmy Fallon/夺冠之夜、七步意面与紫雨俱乐部.html",
+          "title": "夺冠之夜、七步意面与紫雨俱乐部",
+          "sha256": "cfdc38a275cae625943cf8bf7b775ae21db65a8b9681533606ef3e6034fd097d",
+          "modified": "2026-11-23T19:33:23",
+          "date": "2026.11.23",
+          "channel": "The Tonight Show Starring Jimmy Fallon"
+        },
         {
           "id": "Channel/The Tonight Show Starring Jimmy Fallon/火鸡、独轮车与一万分：卡尔金和加纳的猜词夜.html",
           "path": "Channel/The Tonight Show Starring Jimmy Fallon/火鸡、独轮车与一万分：卡尔金和加纳的猜词夜.html",
