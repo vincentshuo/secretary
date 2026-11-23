@@ -1,6 +1,6 @@
 # YouTube 连接与账号订阅同步
 
-> 本文保留旧桌面实现的连接、Keychain 与 Vault 迁移说明，不是当前自托管 Web 产品的目标架构。现行边界见 ADR 0013、ADR 0017，以及[已确认的迁移决策](https://github.com/vincentshuo/Edison/issues/46#issuecomment-6258668775)。新路径及旧入口退役仍待实现和验收；不能据本文推断服务器应依赖本机 Keychain，或旧迁移接口将继续保留。
+> 历史文档。本文描述旧桌面实现的 YouTube 连接、Keychain 与 Vault 迁移；当前 Edison 不再连接 Google 或采集 YouTube 内容，报告以静态文件发布（见 README 与 ADR 0022）。ADR 0013、0017、0018 均已被 ADR 0022 取代。
 
 Edison 使用 Google 的桌面 OAuth 流程（浏览器、随机 loopback 回调、state 校验、PKCE、只读订阅权限）。日常使用不依赖 Automic Vault。
 

@@ -1,6 +1,6 @@
 # Preserve current state during YouTube cutover and code rollback
 
-**Status: accepted (2026-10-19); implementation, migration and production acceptance remain outstanding.**
+**Status: superseded by ADR 0022 (2026-11-23); never implemented.** The server content session this cutover targeted was never built, and Edison no longer acquires YouTube content, so there is nothing to cut over.
 
 YouTube changes to the server-owned content session through one bounded maintenance window, with an independent cutover hold that preserves the person's execution permissions. Existing OAuth is reused only after verification; the content browser receives a fresh formal profile and one explicit initial sign-in. The temporary prototype is not promoted by copying its directory and assuming identity compatibility.
 

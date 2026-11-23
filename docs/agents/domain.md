@@ -6,7 +6,7 @@
 
 ## Before exploring
 
-先读 `GLOSSARY.md` 及其指向的 `CONTEXT.md`，再按任务读取相关 ADR。当前自托管 Web 产品边界以 ADR 0013 及后续有效决策为准；历史桌面决策可能已被取代。
+先读 `GLOSSARY.md` 及其指向的 `CONTEXT.md`，再按任务读取相关 ADR。当前产品边界以 ADR 0022（仅 macOS 桌面应用）及后续有效决策为准；ADR 0013 的自托管 Web 实例已被取代。
 
 缺少文档时继续工作，不为缺失本身打断用户；新术语与重大权衡由 domain-modeling 在实际明确后再写入。尊重现有 GLOSSARY 的委托关系，避免维护两份术语定义。
 

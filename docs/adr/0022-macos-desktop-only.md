@@ -9,5 +9,5 @@ Delivery follows ADR 0011: the app is built locally for Apple Silicon on macOS 1
 ## Consequences
 
 - The classroom archive moves from the server's systemd timer to a schedule on the Mac. Server state is migrated back, and server-only code (web login, web origin allowance, server-to-Mac backup) is removed. This work is tracked separately and does not block new desktop features.
-- ADR 0017 and ADR 0018 assume a server content session. They must be re-evaluated in that retirement work.
+- ADR 0017 and ADR 0018 assumed a server content session that was never built. Edison no longer acquires YouTube content, so both are superseded.
 - Personal data may stay on the machine: a desktop feature should not need a login session or a network round trip.
