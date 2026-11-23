@@ -16,6 +16,9 @@ test("YouTube opens the channel library and preserves reading selections", async
     })).toBeLessThanOrEqual(1);
     await expect(list.first()).toBeInViewport();
   }
+  const filters = feed.getByRole("navigation", {name:"阅读状态"});
+  await expect(filters.getByRole("button")).toHaveText(["未读", "已读", "精选"]);
+  await expect(filters.locator('[aria-current="page"]')).toHaveText("未读");
   const title = await list.first().locator(".title").textContent();
   await list.first().getByRole("button", {name:"精选"}).click();
   await feed.getByRole("navigation").getByText("精选").click();

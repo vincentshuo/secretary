@@ -5,7 +5,7 @@ const message = document.querySelector("#message");
 const publicRoot = new URL("https://vincentshuo.github.io/secretary/youtube/");
 let reportRoot = new URL(".", location.href);
 let reports = [];
-let filter = "all";
+let filter = "unread";
 let selectedChannel = "";
 
 function loadSet(name) {
@@ -78,7 +78,7 @@ function row(doc, index) {
 }
 function render() {
   const group = reports.filter(doc => !selectedChannel || doc.channel === selectedChannel);
-  const visible = group.filter(doc => filter === "all" || stateOf(doc.id) === filter);
+  const visible = group.filter(doc => stateOf(doc.id) === filter);
   list.replaceChildren(...visible.map(row));
   document.querySelector("#count").textContent = visible.length + " 份报告";
   message.textContent = visible.length ? "" : "当前筛选下没有报告。";
