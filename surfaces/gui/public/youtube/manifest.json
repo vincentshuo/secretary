@@ -437,6 +437,15 @@
       "name": "Bloomberg Podcasts",
       "documents": [
         {
+          "id": "Channel/Bloomberg Podcasts/市场抛售之后，AI 股反弹 — Bloomberg News Now 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/市场抛售之后，AI 股反弹 — Bloomberg News Now 精读报告.html",
+          "title": "市场抛售之后，AI 股反弹 — Bloomberg News Now 精读报告",
+          "sha256": "c731ba567d43ce5defbfa6f27327ee8494db1b5ea410d1ca898e3b4b5630a8c1",
+          "modified": "2026-11-23T23:25:20",
+          "date": "2026.11.23",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
           "id": "Channel/Bloomberg Podcasts/海力士跌、台积电涨、零跑下滑 — Stock Movers 精读报告.html",
           "path": "Channel/Bloomberg Podcasts/海力士跌、台积电涨、零跑下滑 — Stock Movers 精读报告.html",
           "title": "海力士跌、台积电涨、零跑下滑 — Stock Movers 精读报告",
