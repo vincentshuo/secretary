@@ -1,23 +1,30 @@
-"""Incremental, credential-free intake of the owner's allowlisted Zhiyun courses.
+"""Incremental intake of the owner's allowlisted Zhiyun courses.
 
-Run as a bounded timer job. No browser session, audio acquisition or ASR is involved.
+The desktop sidecar runs one bounded pass every fifteen minutes with the cookies of the owner's
+platform login (see `curriculum_login`). No audio acquisition or ASR is involved.
 """
 
 from __future__ import annotations
 
+import fcntl
 import hashlib
 import json
+import logging
 import re
+import time
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Callable
 from zoneinfo import ZoneInfo
 
 from .curriculum import SOURCES, CourseArchive, platform_segments, source_gaps, timestamp
 from .secrets import write_private_text
 
+log = logging.getLogger(__name__)
 HOST = "https://classroom.hzcu.edu.cn"
+# Cookies of the owner's campus QR login; the platform answers anonymous requests with 401.
+PLATFORM_SESSION = "platform-session.json"
 PERIOD_ENDS = [
     "08:45",
     "09:35",
@@ -44,6 +51,7 @@ class AccessDenied(PermissionError):
 
 
 ACCESS_DENIED_DETAIL = "平台拒绝访问，请检查请求条件或权限"
+LOGIN_DETAIL = "智云课堂登录已过期，扫码登录后自动继续"
 
 
 def check_access_code(code: Any) -> None:
@@ -53,17 +61,25 @@ def check_access_code(code: Any) -> None:
         raise AuthenticationRequired
 
 
-def fetch_json(path: str) -> dict:
-    request = urllib.request.Request(
-        HOST + path,
-        headers={
-            "User-Agent": "Mozilla/5.0",
-            "Referer": HOST + "/",
-            # The platform rejects requests without a language preference with
-            # HTTP 403, even for endpoints that remain readable without login.
-            "Accept-Language": "en-US,en;q=0.9",
-        },
-    )
+def platform_cookie(store: CourseArchive) -> str:
+    """The Cookie header of the owner's saved platform login, or "" before any login."""
+    try:
+        cookies = json.loads((store.root / PLATFORM_SESSION).read_text(encoding="utf-8"))["cookies"]
+        return "; ".join(f"{c['name']}={c['value']}" for c in cookies)
+    except (OSError, ValueError, KeyError, TypeError):
+        return ""
+
+
+def fetch_json(path: str, cookie: str = "") -> dict:
+    headers = {
+        "User-Agent": "Mozilla/5.0",
+        "Referer": HOST + "/",
+        # The platform rejects requests without a language preference with HTTP 403.
+        "Accept-Language": "en-US,en;q=0.9",
+    }
+    if cookie:
+        headers["Cookie"] = cookie
+    request = urllib.request.Request(HOST + path, headers=headers)
     try:
         with urllib.request.urlopen(request, timeout=35) as response:
             # The platform currently labels JSON as text/html.
@@ -113,7 +129,7 @@ def collect(
                 "pending" if available else "needs_transcript",
                 "" if available else "等待平台生成字幕；旧版本仍保留",
             )
-    errors, acquired = {}, 0
+    errors, acquired, auth_required = {}, 0, False
     for key, (name, cid) in SOURCES.items():
         coverage = {
             "from": "2026-09-14",
@@ -229,7 +245,7 @@ def collect(
                     )
                     failures = int(check.get("failures", 0)) + 1
                     detail = (
-                        "平台需要重新认证，请检查访问权限"
+                        LOGIN_DETAIL
                         if failure == "auth_required"
                         else ACCESS_DENIED_DETAIL
                         if failure == "access_denied"
@@ -241,16 +257,22 @@ def collect(
                             "state": failure,
                             "detail": detail,
                             "failures": failures,
+                            # A lesson blocked by login is retried on the first pass after it.
                             "next_check": epoch
                             + (
-                                86400
-                                if failure in {"auth_required", "access_denied"}
+                                0
+                                if failure == "auth_required"
+                                else 86400
+                                if failure == "access_denied"
                                 else min(6 * 3600, 900 * 2 ** min(failures, 4))
                             ),
                             "checked_at": now.isoformat(),
                         },
                     )
-                    errors[rid] = detail
+                    if failure == "auth_required":
+                        auth_required = True
+                    else:
+                        errors[rid] = detail
                     store.set_state(rid, "failed", detail)
             # Only safe metadata is persisted; content contains media URLs/internal credentials.
             write_private_text(
@@ -259,16 +281,20 @@ def collect(
             )
             coverage.update(complete=True, total=len(discovered))
         except Exception as exc:
-            coverage["error"] = (
-                "平台需要重新认证"
-                if isinstance(exc, AuthenticationRequired)
-                else ACCESS_DENIED_DETAIL
-                if isinstance(exc, AccessDenied)
-                else "课程目录获取失败，等待重试"
-            )
-            errors[key] = coverage["error"]
+            if isinstance(exc, AuthenticationRequired):
+                coverage["error"] = LOGIN_DETAIL
+                auth_required = True
+            else:
+                coverage["error"] = (
+                    ACCESS_DENIED_DETAIL
+                    if isinstance(exc, AccessDenied)
+                    else "课程目录获取失败，等待重试"
+                )
+                errors[key] = coverage["error"]
         store.save_coverage(key, coverage)
-    status.update(checked_at=now.isoformat(), errors=errors, acquired=acquired)
+    status.update(
+        checked_at=now.isoformat(), errors=errors, acquired=acquired, auth_required=auth_required
+    )
     store.save_sync_status("automation", status)
     return status
 
@@ -281,8 +307,6 @@ TRANSCRIPT_PROMPT = """你只对课堂字幕做轻度整理。输入是来源数
 
 
 def generate_transcript(store: CourseArchive, rid: str, manager: Any, *, regenerate=False) -> dict:
-    import fcntl
-
     if not rid.isdigit():
         raise ValueError("无效的平台课次标识")
     locks = store.root / "generation-locks"
@@ -403,8 +427,154 @@ def _generate_transcript(store: CourseArchive, rid: str, manager: Any, *, regene
         raise
 
 
+MODEL_UNAVAILABLE = "Edison 文字模型不可用（凭据或订阅失效），请在设置中更新；待整理课次保留"
+
+
+def model_unavailable(exc: Exception) -> bool:
+    """A provider rejection of the account itself, as opposed to a failure of one request."""
+    code = str(getattr(exc, "code", "") or "")
+    return getattr(exc, "status_code", None) in {401, 403} or "subscription" in code.lower()
+
+
+def archive_pass(
+    store: CourseArchive,
+    manager: Callable[[], Any],
+    *,
+    max_lessons: int = 4,
+    force: bool = False,
+    only: list[str] | None = None,
+    collect_only: bool = False,
+    fetch: Callable[[str], dict] | None = None,
+) -> dict | None:
+    """One bounded pass: discover captions, then edit up to `max_lessons` lessons.
+
+    Returns None when another pass holds the archive. `manager` is called only when a lesson
+    actually needs the text model, so idle polls never load a provider.
+    """
+    with (store.root / "sync.lock").open("a") as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            return None
+        if fetch is None:
+            cookie = platform_cookie(store)
+            fetch = lambda path: fetch_json(path, cookie)  # noqa: E731
+        status = collect(store, force=force, fetch=fetch)
+        if collect_only:
+            return status
+        pending = [
+            r
+            for r in store.listing()["recordings"]
+            if not any(d["perspective"] == "transcript" for d in r["documents"])
+            and store._read_source(r["id"], "platform-segments", [])
+            and (force or store.sync_status("generation:" + r["id"]).get("next_try", 0) <= time.time())
+        ]
+        if only:
+            pending = [r for r in pending if r["id"] in only]
+        if not pending:
+            return status
+        model = manager()
+        if not model.get_settings().get("model_ready"):
+            status["generation_error"] = "请先配置 Edison 文字模型"
+            store.save_sync_status("automation", status)
+            return status
+        status.pop("generation_error", None)
+        for record in pending[: max(0, max_lessons)]:
+            rid = record["id"]
+            status.update(
+                preparing=rid,
+                pending=len(pending),
+                generation_started_at=datetime.now(timezone.utc).isoformat(),
+            )
+            store.save_sync_status("automation", status)
+            try:
+                generate_transcript(store, rid, model)
+                status["errors"].pop("generation:" + rid, None)
+                store.save_sync_status("generation:" + rid, {})
+            except Exception as exc:
+                log.warning("classroom %s preparation failed: %s", rid, type(exc).__name__)
+                if model_unavailable(exc):
+                    # Every lesson would fail the same way; keep them queued, not backed off.
+                    status["generation_error"] = MODEL_UNAVAILABLE
+                    store.set_state(rid, "pending")
+                    break
+                status["errors"]["generation:" + rid] = "字幕整理失败，来源保留，将重试"
+                failures = store.sync_status("generation:" + rid).get("failures", 0) + 1
+                store.save_sync_status(
+                    "generation:" + rid,
+                    {
+                        "failures": failures,
+                        "next_try": time.time() + min(6 * 3600, 900 * 2 ** min(failures, 4)),
+                    },
+                )
+            pending = [r for r in pending if r["id"] != rid]
+        status.update(
+            preparing=None, pending=len(pending), finished_at=datetime.now(timezone.utc).isoformat()
+        )
+        store.save_sync_status("automation", status)
+        return status
+
+
+# The Homework backup app has the owner's folder permission; Edison hands it the reader's
+# Markdown through these private files and reads back what it applied.
+HOMEWORK_EXPORT = "homework-export.json"
+HOMEWORK_ACK = "homework-ack.json"
+
+
+def publish_export(store: CourseArchive) -> dict:
+    """Write the current export for the Homework backup and record its latest acknowledgement."""
+    current = export_documents(store)
+    target = store.root / HOMEWORK_EXPORT
+    try:
+        published = json.loads(target.read_text(encoding="utf-8")).get("revision")
+    except (OSError, ValueError):
+        published = None
+    if published != current["revision"]:
+        write_private_text(target, json.dumps(current, ensure_ascii=False))
+    record_backup(store, current["revision"])
+    return current
+
+
+def record_backup(store: CourseArchive, current_revision: str) -> dict:
+    status = store.sync_status("backup")
+    try:
+        ack = json.loads((store.root / HOMEWORK_ACK).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        ack = None
+    if isinstance(ack, dict):
+        revision = ack.get("revision", "")
+        conflicts = ack.get("conflicts", [])
+        files = ack.get("files", 0)
+        valid = (
+            isinstance(revision, str)
+            and len(revision) == 64
+            and all(c in "0123456789abcdef" for c in revision)
+            and isinstance(conflicts, list)
+            and all(isinstance(c, str) for c in conflicts)
+            and isinstance(files, int)
+        )
+        if valid:
+            status = {
+                "checked_at": ack.get("checked_at") if isinstance(ack.get("checked_at"), str) else status.get("checked_at"),
+                "revision": revision,
+                "files": files,
+                "conflicts": conflicts[:100],
+            }
+    if status.get("revision"):
+        status["current_revision"] = current_revision
+        status["state"] = (
+            "conflict"
+            if status.get("conflicts")
+            else "synced"
+            if status["revision"] == current_revision
+            else "pending"
+        )
+    store.save_sync_status("backup", status)
+    return status
+
+
 def export_documents(store: CourseArchive) -> dict:
-    """Export only documents visible in the Web reader, never source/state files."""
+    """Export only documents visible in the reader, never source/state files."""
     snapshot = store.listing()
     files = []
     for record in snapshot["recordings"]:

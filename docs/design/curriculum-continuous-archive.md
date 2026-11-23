@@ -1,6 +1,6 @@
 # 智云课堂持续归档与 Homework 备份
 
-2026-10-12 用户完成 grill-with-docs 访谈并确认实施。本文覆盖旧历史回填规格中“本次不做未来归档”、默认详细复习笔记及旅游排除的限制；保留 ADR 0013、0014 的单个 Web 主实例与平台课次身份。
+2026-10-12 用户完成 grill-with-docs 访谈并确认实施。本文覆盖旧历史回填规格中“本次不做未来归档”、默认详细复习笔记及旅游排除的限制；保留 ADR 0014 的平台课次身份。2026-11-23 起按 ADR 0022 在 Mac 桌面应用内运行，原服务器实例退役。
 
 ## 已确认的行为
 
@@ -10,25 +10,19 @@
 
 ## 实现与运行
 
-- `coworker/curriculum.py` 延用 SQLite 归档，新增运行与备份状态，提供当前稿和可选择的历史版本。
-- `coworker/curriculum_sync.py` 匿名读取授权课程目录与字幕；只保存安全目录元数据。按约九十秒来源块整理，校验所有块身份与顺序、完整返回及粗略长度，防止漏块、截断和明显概括。保真仍需要来源核对，自动校验不证明语义逐字正确。
+- `coworker/curriculum.py` 延用 SQLite 归档，记录运行与备份状态，提供当前稿和可选择的历史版本。档案位于桌面应用状态目录的 `curriculum/`。
+- 平台自 2026-11-17 起拒绝匿名请求（`401 未获取到用户信息`），并会周期性要求重新认证。学校统一认证只能由本人手机扫码，`coworker/curriculum_login.py` 因此在 Edison 自己的浏览器档案 `curriculum/platform-browser/` 中完成登录，只把平台域名的 Cookie 存入私有文件 `curriculum/platform-session.json`；不读取用户日常浏览器，不保存账号密码。会话过期时先用档案内统一认证的长期票据无窗口续期，失败才在课程档案页提示“扫码登录”，扫码后立即补跑一轮。登录过期作为 `auth_required` 单独呈现，不混入课程错误；因登录受阻的课次在下一轮直接复查。
+- `coworker/curriculum_sync.py` 携带该会话读取授权课程目录与字幕，只保存安全目录元数据。按约九十秒来源块整理，校验所有块身份与顺序、完整返回及粗略长度，防止漏块、截断和明显概括。保真仍需要来源核对，自动校验不证明语义逐字正确。
 - 整理复用 Edison 当前模型与凭据；Ark Coding Plan 的本次编辑请求单独关闭深度思考并设置超时，不改共享模型配置。依据：[官方 Coding Plan 文档](https://docs.volcengine.com/docs/ark/coding-plan-personal-ai-claude-code?lang=zh)。
-- `scripts/sync_classrooms.py` 一次有限运行，归档进程锁防止重叠；每课次生成锁协调手动重试与定时整理。`packaging/edison-classrooms.timer` 每十五分钟触发，上一轮未结束时顺延，单轮默认最多四次课堂；历史回填另用有限批次。执行结束释放内存，没有新增常驻模型服务。
-- `scripts/export_classrooms.py` 通过现有 SSH 通道导出与 Web 相同的 Markdown，并接收本地版本确认。没有新增公开原文、数据库或媒体下载接口。
-- Homework 的 Python 接收器只维护专用生成目录，验证路径、校验内容并原子写入。人工修改另存 incoming 副本，不自动删除本地资料、不运行 Git。
-- Mac 的具名小程序使用系统文件夹选择窗口获得用户对 Homework 的访问授权；保存文件夹书签，每五分钟运行一次后退出。裸后台 Python 曾被 macOS 的桌面隐私保护拒绝；没有用切换解释器、关闭防护或全盘授权绕过。依据：[Apple NSOpenPanel](https://developer.apple.com/documentation/appkit/nsopenpanel)。
+- `archive_pass` 是一次有限运行：归档进程锁防止重叠，每课次生成锁协调手动整理与定时整理，单轮默认最多四次课堂，只有确实有待整理课次时才加载模型。已启用自动检查的档案在应用运行期间由 sidecar 每十五分钟执行一轮，启动后一分钟先补一轮；新档案保持空闲。`scripts/sync_classrooms.py` 手动执行同一轮次，历史回填另用有限批次。
+- 每轮结束后，`publish_export` 把与阅读器相同的 Markdown 写入私有文件 `curriculum/homework-export.json`，并读取 `homework-ack.json` 中的备份确认。不导出原文、数据库、媒体地址或日志。
+- Homework 的具名小程序沿用系统文件夹选择窗口取得的 Homework 授权，每五分钟读取本地导出，验证路径与内容后原子写入，人工修改另存 incoming 副本，再写回确认。不自动删除本地资料、不运行 Git。裸后台 Python 曾被 macOS 的桌面隐私保护拒绝，因此写入 Homework 的仍是这个获授权的小程序。依据：[Apple NSOpenPanel](https://developer.apple.com/documentation/appkit/nsopenpanel)。
 
-Web 已归档与本地已备份分开显示。备份确认对应具体导出 revision；服务器新增文档后立刻重新显示待补齐，Mac 恢复联网后补传。最近成功时间只说明该时刻的备份，不证明 Mac 目前在线。
-
-## 部署边界
-
-部署仅替换 curriculum、curriculum_sync、server/curriculum 与本次脚本；未覆盖工作区其他在途 Python/认证改动。Web 从 HEAD 单独构建，叠加课程界面与类型，并保留自托管同源地址解析；未夹带当前其他 API 行为修改。回退代码、旧 Web 及一致性 SQLite 副本保留在服务器私有 rollback-caption-sync 目录。
-
-真实网页此前的通用错误已复现并确认是 Edison 浏览器会话过期：带认证的服务端归档 API 正常，刷新进入登录页。已使用用户保存的正常登录项恢复，不关闭认证。新界面对 401/403 明确给出登录入口。
-
-真实阅读页验收发现过第二个问题：切换 Web 构建时，已打开的旧页面仍会按旧文件名加载阅读器，当前发布目录缺少该静态文件会使页面空白。已补齐旧构建的哈希资源，真实阅读页恢复。以后通过 `scripts/promote_web_release.py RELEASE --live /srv/edison/app/web` 发布：先继承上一版缺失的哈希资源，再原子切换链接；不覆盖新版文件。脚本已部署，当前版本执行成功。
+档案已归档与 Homework 已备份分开显示。备份确认对应具体导出 revision；归档新增文档后立刻重新显示待补齐，小程序下一次运行后补齐。应用未运行时不检查新课次，重新打开后补跑。
 
 ## 验收记录
+
+以下是 2026-10 服务器部署时期的验收记录，保留作历史依据。
 
 后端归档与持续流程测试 21 项、备份测试 2 项、课程档案 Playwright 测试 8 项、Web 发布回归测试 1 项通过；隔离 Web 构建成功。覆盖迟到字幕、来源更新与旧版保留、无变化幂等、空响应/认证拒绝保留资料、未来及错误课程身份排除、遗漏时间块拒收、人工修改保护、路径校验、登录提示稳定性与旧页面静态资源保留。
 

@@ -50,7 +50,6 @@ dependencies = [
     "pypdfium2>=4",
     "tzdata; sys_platform == 'win32'",
     "tomli>=2; python_version < '3.11'",
-    "bcrypt>=4,<6",
     "defusedxml>=0.7.1,<1",
     # Body profile: NAVER Anny parametric body (Apache-2.0 code, CC0 MakeHuman assets).
     "anny==0.6.2",

@@ -44,8 +44,12 @@ A lightly edited, time-referenced rendering of platform captions. It may remove 
 _Avoid_: Summary, expanded lecture, guaranteed complete speech record
 
 **Classroom backup（课堂本地备份）**:
-A retained copy of the same reader-visible classroom document versions on the person's device. A server archive and a device backup can be current at different times.
+A retained copy of the same reader-visible classroom document versions in the person's Homework folder, written by the Homework backup app from Edison's local export. The archive and the backup can be current at different times.
 _Avoid_: Another Edison instance, browser cache, Git push
+
+**Platform login（平台登录）**:
+The person's own campus sign-in to the classroom recording platform, given by a QR scan in Edison's login window and held only on this Mac. The platform expires it periodically; Edison renews it silently when it can and otherwise asks for a new scan.
+_Avoid_: Account password, everyday browser session, shared credential
 
 **Recorded class（录播课次）**:
 A classroom session identified and listed by the classroom recording platform. It is the unit of classroom document archiving, distinct from a scheduled course occurrence or a single numbered class period.

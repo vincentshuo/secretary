@@ -5,17 +5,13 @@ declare const __COWORKER_DEV_TOKEN__: string;
 // Endpoint resolution order: runtime-injected globals (Tauri sets `window.__COWORKER_HTTP__`
 // for its dynamically-chosen sidecar port) → Vite env → the 127.0.0.1:8765 dev default. This
 // keeps a single codebase: browser `npm run dev` hits 8765; the desktop shell hits its sidecar.
-const selfHostedOrigin = (): string | null =>
-  globalThis.location?.protocol === "https:" ? globalThis.location.origin : null;
 const httpBase = (): string =>
   (globalThis as any).__COWORKER_HTTP__ ||
   (import.meta as any).env?.VITE_COWORKER_HTTP ||
-  selfHostedOrigin() ||
   "http://127.0.0.1:8765";
 const wsBase = (): string =>
   (globalThis as any).__COWORKER_WS__ ||
   (import.meta as any).env?.VITE_COWORKER_WS ||
-  (selfHostedOrigin() ? selfHostedOrigin()!.replace(/^https:/, "wss:") : null) ||
   "ws://127.0.0.1:8765";
 const apiToken = (): string =>
   (globalThis as any).__COWORKER_API_TOKEN__ ||
@@ -2562,8 +2558,9 @@ export interface CourseArchiveSnapshot {
   recordings: RecordedClass[];
   courses: { key: string; name: string }[];
   coverage: Record<string, { from: string; through: string; complete: boolean; checked_at?: string }>;
-  automation?: { enabled?: boolean; checked_at?: string; preparing?: string | null; pending?: number; errors?: Record<string, string>; generation_error?: string };
+  automation?: { enabled?: boolean; checked_at?: string; preparing?: string | null; pending?: number; errors?: Record<string, string>; generation_error?: string; auth_required?: boolean };
   backup?: { state?: string; checked_at?: string; files?: number; conflicts?: string[] };
+  platform?: { signing_in?: boolean };
 }
 export interface ClassroomDocument extends ClassroomDocumentSummary { markdown: string; recording_id: string }
 async function curriculumRequest<T>(path: string, init?: RequestInit): Promise<T> {
@@ -2587,6 +2584,8 @@ export async function getOccurrenceDocuments(course: string, date: string, first
   return data;
 }
 export const prepareClassroomDocument = (id: string) => curriculumRequest<{ state: string }>(`recordings/${encodeURIComponent(id)}/prepare`, { method: "POST" });
+// Opens the platform's QR login in Edison's browser; the archive resumes once the owner scans.
+export const signInClassroomPlatform = () => curriculumRequest<{ signing_in: boolean }>("platform/sign-in", { method: "POST" });
 export async function downloadClassroomDocument(id: string, title: string) {
   const response = await fetch(`${httpBase()}/v1/curriculum/documents/${encodeURIComponent(id)}/download`);
   if (!response.ok) throw new Error(`Course archive: ${response.status}`);

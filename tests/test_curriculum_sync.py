@@ -7,14 +7,22 @@ from types import SimpleNamespace
 import pytest
 
 from coworker.curriculum import CourseArchive
+from coworker.curriculum_login import renew
 from coworker.curriculum_sync import (
+    HOMEWORK_ACK,
+    HOMEWORK_EXPORT,
+    MODEL_UNAVAILABLE,
+    PLATFORM_SESSION,
     AccessDenied,
     AuthenticationRequired,
+    archive_pass,
     collect,
     export_documents,
     fetch_json,
     generate_transcript,
+    publish_export,
 )
+from coworker.server.curriculum import _pass, start_archive_loop
 
 NOW = datetime(2026, 10, 12, 12, tzinfo=timezone.utc)
 RAW = {
@@ -172,12 +180,13 @@ def test_empty_or_auth_error_never_erases_existing_source(monkeypatch, tmp_path)
     assert store.recording("123")["documents"][0]["id"] == first["id"]
     state[0] = AuthenticationRequired()
     result = collect(store, now=NOW, fetch=fetch, force=True)
-    assert result["errors"] and store.sync_status("lesson:123")["state"] == "auth_required"
+    assert result["auth_required"] and not result["errors"]
+    assert store.sync_status("lesson:123")["state"] == "auth_required"
     assert store.document(first["id"])["markdown"]
     state[0] = AccessDenied()
     result = collect(store, now=NOW, fetch=fetch, force=True)
     assert store.sync_status("lesson:123")["state"] == "access_denied"
-    assert "重新认证" not in json.dumps(result["errors"], ensure_ascii=False)
+    assert result["errors"] and not result["auth_required"]
     assert store.recording("123")["documents"][0]["id"] == first["id"]
     state[0] = RAW
     result = collect(store, now=NOW, fetch=fetch, force=True)
@@ -256,3 +265,117 @@ def test_old_notes_kept_but_cannot_satisfy_transcript_generation(monkeypatch, tm
         generate_transcript(store, "123", bad)
     assert not store.recording("123")["documents"]
     assert store.document(old["id"])["markdown"]
+
+
+def platform_with(item):
+    return lambda p: {"success": True, "result": {"code": 200, "data": [item]}} if "catalogue" in p else RAW
+
+
+def ready(manager):
+    manager.get_settings = lambda: {"model_ready": True}
+    return manager
+
+
+def test_archive_pass_loads_the_model_only_for_pending_lessons_and_skips_overlaps(monkeypatch, tmp_path):
+    import fcntl
+
+    store, item = setup(monkeypatch, tmp_path)
+    manager, calls = model()
+    loads = []
+
+    def load():
+        loads.append(1)
+        return ready(manager)
+
+    status = archive_pass(store, load, fetch=platform_with(item))
+    assert loads == [1] and len(calls) == 1 and status["pending"] == 0
+    assert store.recording("123")["documents"][0]["perspective"] == "transcript"
+    archive_pass(store, load, fetch=platform_with(item))
+    assert loads == [1]
+    with (store.root / "sync.lock").open("a") as held:
+        fcntl.flock(held, fcntl.LOCK_EX)
+        assert archive_pass(store, load, fetch=platform_with(item)) is None
+
+
+def test_an_unavailable_model_stops_the_pass_and_keeps_lessons_queued(monkeypatch, tmp_path):
+    store, item = setup(monkeypatch, tmp_path)
+    expired = type("BadRequestError", (Exception,), {"status_code": 400, "code": "InvalidSubscription"})
+    calls = []
+
+    def complete(*args, **kwargs):
+        calls.append(1)
+        raise expired()
+
+    manager = ready(SimpleNamespace(model="configured-host", provider_complete=complete))
+    status = archive_pass(store, lambda: manager, fetch=platform_with(item))
+    assert status["generation_error"] == MODEL_UNAVAILABLE and not status["errors"]
+    assert len(calls) == 1 and store.recording("123")["state"] == "pending"
+    assert store.sync_status("generation:123") == {}
+
+
+def test_homework_export_is_published_locally_and_acknowledgements_drive_backup_state(monkeypatch, tmp_path):
+    store, item = setup(monkeypatch, tmp_path)
+    manager, _ = model()
+    archive_pass(store, lambda: ready(manager), fetch=platform_with(item))
+    current = publish_export(store)
+    exported = store.root / HOMEWORK_EXPORT
+    assert json.loads(exported.read_text())["revision"] == current["revision"]
+    assert oct(exported.stat().st_mode & 0o777) == "0o600"
+    assert store.sync_status("backup") == {}
+    ack = {"revision": current["revision"], "files": 1, "conflicts": [], "checked_at": NOW.isoformat()}
+    (store.root / HOMEWORK_ACK).write_text(json.dumps(ack))
+    assert publish_export(store) and store.sync_status("backup")["state"] == "synced"
+    (store.root / HOMEWORK_ACK).write_text(json.dumps({**ack, "conflicts": ["x.md"]}))
+    publish_export(store)
+    assert store.sync_status("backup")["state"] == "conflict"
+    (store.root / HOMEWORK_ACK).write_text(json.dumps({**ack, "revision": "not-a-revision"}))
+    publish_export(store)
+    assert store.sync_status("backup")["conflicts"] == ["x.md"]
+
+
+def test_archive_pass_sends_the_saved_login_and_flags_its_expiry(monkeypatch, tmp_path):
+    store, _ = setup(monkeypatch, tmp_path)
+    cookies = [{"name": "_token", "value": "synthetic", "domain": ".hzcu.edu.cn"}]
+    (store.root / PLATFORM_SESSION).write_text(json.dumps({"cookies": cookies}))
+    sent = []
+
+    def platform(request, **kwargs):
+        sent.append(request.get_header("Cookie"))
+        return BytesIO(json.dumps({"success": True, "result": {"code": 401, "data": []}}).encode())
+
+    monkeypatch.setattr("urllib.request.urlopen", platform)
+    status = archive_pass(store, lambda: pytest.fail("no lesson needs the model"))
+    assert sent == ["_token=synthetic"]
+    assert status["auth_required"] and not status["errors"]
+
+
+def test_an_expired_login_is_renewed_silently_before_the_owner_is_asked(monkeypatch, tmp_path):
+    store = CourseArchive(tmp_path / "archive")
+    passes, renewals = [], []
+
+    def archive(*args, **kwargs):
+        passes.append(1)
+        return {"auth_required": len(passes) == 1}
+
+    monkeypatch.setattr("coworker.server.curriculum.archive_pass", archive)
+    monkeypatch.setattr("coworker.server.curriculum.publish_export", lambda store: None)
+    monkeypatch.setattr("coworker.server.curriculum.renew", lambda store: renewals.append(1) or True)
+    _pass(store, object())
+    assert renewals == [1] and len(passes) == 2
+    _pass(store, object())
+    assert renewals == [1] and len(passes) == 3
+    # Without an earlier scan there is no profile to renew from, so no browser starts.
+    assert renew(store) is False
+
+
+def test_only_an_enabled_archive_starts_the_sidecar_loop(monkeypatch, tmp_path):
+    started = []
+    monkeypatch.setattr("coworker.server.curriculum._archive_loop", lambda *a: started.append(a))
+    store = CourseArchive(tmp_path / "archive")
+    assert start_archive_loop(store, object()) is None
+    store.save_sync_status("automation", {"enabled": True})
+    monkeypatch.setenv("EDISON_CLASSROOM_SYNC", "0")
+    assert start_archive_loop(store, object()) is None
+    monkeypatch.delenv("EDISON_CLASSROOM_SYNC")
+    start_archive_loop(store, object()).join(5)
+    assert len(started) == 1

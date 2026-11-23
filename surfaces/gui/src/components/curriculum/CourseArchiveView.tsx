@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { downloadClassroomDocument, getClassroomDocument, getCourseArchive, prepareClassroomDocument } from "../../api";
+import { downloadClassroomDocument, getClassroomDocument, getCourseArchive, prepareClassroomDocument, signInClassroomPlatform } from "../../api";
 import type { ClassroomDocument, CourseArchiveSnapshot, RecordedClass } from "../../api";
 import { Icon } from "../Icon";
 import { CurriculumHeader } from "./CurriculumHeader";
@@ -18,38 +18,43 @@ export function CourseArchiveView({ documentId, onOpenDocument, onTimetable }: {
   const [course, setCourse] = useState("");
   const [showWaiting, setShowWaiting] = useState(false);
   const list = useRef<HTMLDivElement>(null);
-  const [error, setError] = useState<false | "auth" | "general">(false);
-  const failed = (cause: unknown) => setError(/Course archive: (401|403)/.test(String(cause)) ? "auth" : "general");
+  const [error, setError] = useState(false);
+  const failed = () => setError(true);
   const [refresh, setRefresh] = useState(0);
   const [pending, setPending] = useState<string | null>(null);
   useEffect(() => {
     let live = true;
-    getCourseArchive().then(data => { if (live) { setSnapshot(data); setError(false); } }).catch(cause => { if (live) failed(cause); });
+    getCourseArchive().then(data => { if (live) { setSnapshot(data); setError(false); } }).catch(() => { if (live) failed(); });
     return () => { live = false; };
   }, [refresh]);
   useEffect(() => {
     let live = true;
     setDoc(null);
     setError(false);
-    if (documentId) getClassroomDocument(documentId).then(value => { if (live) setDoc(value); }).catch(cause => { if (live) failed(cause); });
+    if (documentId) getClassroomDocument(documentId).then(value => { if (live) setDoc(value); }).catch(() => { if (live) failed(); });
     return () => { live = false; };
   }, [documentId]);
-  const working = snapshot?.recordings.some(record => ["pending", "generating"].includes(record.state));
+  const signingIn = !!snapshot?.platform?.signing_in;
+  const working = signingIn || snapshot?.recordings.some(record => ["pending", "generating"].includes(record.state));
   useEffect(() => {
-    if ((!working && !snapshot?.automation?.enabled) || documentId || error === "auth") return;
+    if ((!working && !snapshot?.automation?.enabled) || documentId) return;
     const timer = window.setInterval(() => setRefresh(value => value + 1), working ? 5000 : 30000);
     return () => window.clearInterval(timer);
-  }, [working, documentId, snapshot?.automation?.enabled, error]);
+  }, [working, documentId, snapshot?.automation?.enabled]);
+  const signIn = async () => {
+    setError(false);
+    try { await signInClassroomPlatform(); setRefresh(value => value + 1); } catch { failed(); }
+  };
   const prepare = async (record: RecordedClass) => {
     setPending(record.id);
     setError(false);
     try { await prepareClassroomDocument(record.id); setRefresh(value => value + 1); }
-    catch (cause) { failed(cause); }
+    catch { failed(); }
     finally { setPending(null); }
   };
   const download = async () => {
     if (!doc) return;
-    try { await downloadClassroomDocument(doc.id, doc.title); } catch (cause) { failed(cause); }
+    try { await downloadClassroomDocument(doc.id, doc.title); } catch { failed(); }
   };
   const ready = snapshot?.recordings.filter(record => record.documents.length).length ?? 0;
   const waiting = snapshot?.recordings.filter(record => record.state === "needs_transcript") ?? [];
@@ -80,7 +85,7 @@ export function CourseArchiveView({ documentId, onOpenDocument, onTimetable }: {
         {doc && <button onClick={download}><Icon name="file" size={14} />{t("course_archive.download")}</button>}
       </div>
     </header>
-    {error && <div className="course-archive-message" role="alert">{t(error === "auth" ? "course_archive.auth_error" : "course_archive.error")} {error === "auth" ? <a href="/login">{t("course_archive.sign_in")}</a> : <button onClick={() => { setRefresh(value => value + 1); if (documentId) { setError(false); getClassroomDocument(documentId).then(setDoc).catch(failed); } }}>{t("course_archive.retry")}</button>}</div>}
+    {error && <div className="course-archive-message" role="alert">{t("course_archive.error")} <button onClick={() => { setRefresh(value => value + 1); if (documentId) { setError(false); getClassroomDocument(documentId).then(setDoc).catch(failed); } }}>{t("course_archive.retry")}</button></div>}
     {documentId ? <>
       {doc ? <div className="course-archive-reader-scroll">
         {related && <div className="course-archive-source">
@@ -93,6 +98,7 @@ export function CourseArchiveView({ documentId, onOpenDocument, onTimetable }: {
     </> : <>
       {snapshot && <ArchiveStatus snapshot={snapshot} />}
       {snapshot?.backup?.state === "conflict" && <div className="course-archive-attention" role="alert"><Icon name="warning" size={16} /><p>{t("course_archive.backup_detail_conflict")} {t("course_archive.conflicts", { count: snapshot.backup.conflicts?.length ?? 0 })}</p></div>}
+      {snapshot?.automation?.auth_required && <div className="course-archive-attention" role="alert"><Icon name="warning" size={16} /><p>{t(signingIn ? "course_archive.login_waiting" : "course_archive.login_required")}</p>{!signingIn && <button className="course-archive-prepare" onClick={signIn}>{t("course_archive.login_action")}</button>}</div>}
       {!!automationErrors.length && <div className="course-archive-attention" role="alert"><Icon name="warning" size={16} /><div>{[...new Set(automationErrors)].map(message => <p key={message}>{message}</p>)}</div></div>}
       <div className="course-archive-workspace">
         <nav className="course-archive-courses" aria-label={t("course_archive.course_navigation")}>

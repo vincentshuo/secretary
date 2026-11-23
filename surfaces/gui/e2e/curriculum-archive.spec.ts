@@ -3,7 +3,7 @@ const note = { id: "notes-design", perspective: "exam-notes", title: "三维造�
 const record = { id: "2044986", course: "design", name: "三维造型与工业设计", title: "2026-10-09第6-7节", date: "2026-10-09", first: 6, last: 7, teacher: "张哲硕", room: "城市学院文3-115", source_url: "https://classroom.hzcu.edu.cn/livingroom?course_id=53450&sub_id=2044986", state: "ready", detail: "", warnings: [], documents: [note] };
 const markdown = "# 草图与零件建模\n\n## 课堂正文 [00:02:11]\n\n用装配体组织零件，保留设计意图。\n\n\\[a^2+b^2=c^2\\]\n\n```python\nprint(1 + 2)\n```\n\n## 补充理解\n\n这里是明确标注的补充解释。";
 
-test("shows edited transcripts, preserved versions and the independent Mac backup state", async ({ page }) => {
+test("shows edited transcripts, preserved versions and the independent Homework backup state", async ({ page }) => {
   await page.route("**/v1/curriculum/archive", route => route.fulfill({ json: {
     courses: [{ key: "design", name: record.name }],
     recordings: [{ ...record, documents: [{ ...note, perspective: "transcript" }], history: [{ ...note, id: "old-notes" }] }],
@@ -11,18 +11,10 @@ test("shows edited transcripts, preserved versions and the independent Mac backu
   } }));
   await page.getByTestId("nav-curriculum").click();
   await page.getByTestId("nav-course-archive").click();
-  await expect(page.getByRole("status")).toContainText("Mac 待补齐");
+  await expect(page.getByRole("status")).toContainText("Homework 待补齐");
   await page.getByRole("button", { name: /2026-10-09第6-7节.*字幕整理稿/ }).click();
   await expect(page.getByLabel("文档版本")).toBeVisible();
   await expect(page.getByLabel("文档版本").locator("option")).toHaveCount(2);
-});
-
-test("distinguishes an expired Edison login from a broken archive", async ({ page }) => {
-  await page.route("**/v1/curriculum/archive", route => route.fulfill({ status: 401 }));
-  await page.getByTestId("nav-curriculum").click();
-  await page.getByTestId("nav-course-archive").click();
-  await expect(page.getByRole("alert")).toContainText("登录已失效");
-  await expect(page.getByRole("link", { name: "登录 Edison" })).toHaveAttribute("href", "/login");
 });
 
 test("groups repeated platform failures in both the alert and status details", async ({ page }) => {
@@ -49,27 +41,6 @@ test("groups repeated platform failures in both the alert and status details", a
   await page.screenshot({ path: "test-results/course-platform-errors.png" });
 });
 
-test("keeps an expired-login prompt stable and stops automatic requests until sign-in", async ({ page }) => {
-  let requests = 0;
-  let expired = false;
-  await page.route("**/v1/curriculum/archive", route => {
-    requests += 1;
-    return !expired ? route.fulfill({ json: {
-      courses: [{ key: "design", name: record.name }], recordings: [{ ...record, state: "pending", documents: [] }],
-      coverage: {}, automation: { enabled: true },
-    } }) : route.fulfill({ status: 401 });
-  });
-  await page.getByTestId("nav-curriculum").click();
-  await page.getByTestId("nav-course-archive").click();
-  await expect(page.getByText("自动检查已启用", { exact: true }).first()).toBeVisible();
-  expired = true;
-  await page.getByRole("button", { name: "刷新档案" }).click();
-  await expect(page.getByRole("alert")).toContainText("登录已失效");
-  const requestsAtExpiry = requests;
-  await page.waitForTimeout(6000);
-  await expect(page.getByRole("link", { name: "登录 Edison" })).toBeVisible();
-  expect(requests).toBe(requestsAtExpiry);
-});
 test.beforeEach(async ({ page }) => {
   await page.clock.setFixedTime(new Date("2026-10-10T00:00:00Z"));
   await page.addInitScript(() => localStorage.setItem("openworker.lang", "zh"));
@@ -206,7 +177,7 @@ test("discloses independent timestamps and exposes conflicts without opening det
   await expect(details.locator("summary")).toBeFocused();
   state = "synced";
   await page.getByRole("button", { name: "刷新档案" }).click();
-  await expect(page.getByRole("status")).toHaveText("Mac 已备份");
+  await expect(page.getByRole("status")).toHaveText("Homework 已备份");
   state = "conflict";
   await page.getByRole("button", { name: "刷新档案" }).click();
   await expect(page.getByRole("status")).toHaveText("本地修改需核对");
