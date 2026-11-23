@@ -38,6 +38,15 @@
       "name": "Aalto University",
       "documents": [
         {
+          "id": "Channel/Aalto University/建筑史、人类世与地质时间尺度 — Panu Savolainen 精读报告.html",
+          "path": "Channel/Aalto University/建筑史、人类世与地质时间尺度 — Panu Savolainen 精读报告.html",
+          "title": "建筑史、人类世与地质时间尺度 — Panu Savolainen 精读报告",
+          "sha256": "32633fd6db2414f86b63f6b339c5f8131fd6909c3d6ff9847bbf5d3fa337b54e",
+          "modified": "2026-11-23T21:03:14",
+          "date": "2026.11.23",
+          "channel": "Aalto University"
+        },
+        {
           "id": "Channel/Aalto University/Samu Taulu - Electromagnetism in Brain Imaging: Finding the Needle in the Haystack.html",
           "path": "Channel/Aalto University/Samu Taulu - Electromagnetism in Brain Imaging: Finding the Needle in the Haystack.html",
           "title": "脑中寻针：电磁学探听大脑 — Samu Taulu（Aalto 大学）精读报告",
