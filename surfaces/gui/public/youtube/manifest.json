@@ -437,6 +437,15 @@
       "name": "Bloomberg Podcasts",
       "documents": [
         {
+          "id": "Channel/Bloomberg Podcasts/药物、药片与光：攻克阿尔茨海默的多种路径 — Ending Alzheimer's 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/药物、药片与光：攻克阿尔茨海默的多种路径 — Ending Alzheimer's 精读报告.html",
+          "title": "药物、药片与光：攻克阿尔茨海默的多种路径 — Ending Alzheimer's 精读报告",
+          "sha256": "6af33f3a26565bc3b2f9f8ad93341aaf717ca6601cc4cf6c4dc2201fb0cda0ad",
+          "modified": "2026-11-23T21:52:55",
+          "date": "2026.11.23",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
           "id": "Channel/Bloomberg Podcasts/一个 vibecoder 小镇折射的中国经济 — Odd Lots 精读报告.html",
           "path": "Channel/Bloomberg Podcasts/一个 vibecoder 小镇折射的中国经济 — Odd Lots 精读报告.html",
           "title": "一个 vibecoder 小镇折射的中国经济 — Odd Lots 精读报告",
