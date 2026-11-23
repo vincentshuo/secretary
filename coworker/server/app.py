@@ -250,6 +250,8 @@ def create_app(manager: SessionManager) -> FastAPI:
     app.state.manager = manager
     from .curriculum import attach_curriculum
     attach_curriculum(app, manager)
+    from .body import attach_body
+    attach_body(app, manager)
 
     @app.get("/v1/health")
     def health(request: Request) -> dict[str, Any]:
