@@ -23,7 +23,12 @@ hides the window while keeping stdio intact.
 import os
 import sys
 
-from PyInstaller.utils.hooks import collect_all, collect_data_files, collect_submodules
+from PyInstaller.utils.hooks import (
+    collect_all,
+    collect_data_files,
+    collect_submodules,
+    copy_metadata,
+)
 
 # SPECPATH is injected by PyInstaller and points at this file's directory
 # (<repo>/packaging). Derive everything else from it — no hardcoded paths.
@@ -94,6 +99,22 @@ for pkg in ("slack_bolt", "telegram"):  # [messaging] extra — optional
     except Exception:
         pass
 
+# Body profile: Anny (NAVER) on torch. Anny resolves its assets relative to its own package
+# (anny/data: mesh, rigs, cached .pth) and reads its version via importlib.metadata, so ship
+# the data and the dist-info. torch itself is handled by pyinstaller-hooks-contrib's hook.
+# Anny lazily imports NVIDIA warp for warp_lbs / collision / SOMA; we only use
+# skinning_method='lbs', so warp (and anny's demo scripts) are excluded below.
+hiddenimports += ["anny", "torch"] + collect_submodules(
+    "anny", filter=lambda name: not name.startswith("anny.examples")
+)
+datas += collect_data_files("anny") + copy_metadata("anny")
+datas += collect_data_files("trimesh")  # model_transforms imports trimesh (resources/ JSON)
+# Prebuilt Anny model cache (`python -m coworker.body.cache build/anny-cache`, run by the build
+# script); shipped as `anny_cache/` inside the bundle so the first launch skips the slow build.
+ANNY_CACHE = os.path.join(ROOT, "build", "anny-cache")
+if os.path.isdir(ANNY_CACHE):
+    datas.append((ANNY_CACHE, "anny_cache"))
+
 a = Analysis(
     [os.path.join(PACKAGING, "server_entry.py")],
     pathex=[ROOT, os.path.join(ROOT, "src")],
@@ -102,7 +123,8 @@ a = Analysis(
     hiddenimports=hiddenimports,
     hookspath=[],
     runtime_hooks=[],
-    excludes=["tkinter", "matplotlib", "PIL", "PyQt5", "PySide6"]
+    # PIL stays: `import anny` pulls PIL.Image (face_segmentation / anny_inverter).
+    excludes=["tkinter", "matplotlib", "PyQt5", "PySide6", "warp"]
     + ([] if INCLUDE_EXPERIMENTAL else ["coworker.connectors.experimental"]),
     noarchive=False,
 )
