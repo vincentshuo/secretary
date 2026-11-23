@@ -36,14 +36,6 @@
       "entitlements": "entitlements.plist",
       "signingIdentity": "-",
       "minimumSystemVersion": "14.0"
-    },
-    "windows": {
-      "webviewInstallMode": {
-        "type": "downloadBootstrapper"
-      },
-      "nsis": {
-        "installMode": "currentUser"
-      }
     }
   },
   "plugins": {}
