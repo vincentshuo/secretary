@@ -437,6 +437,24 @@
       "name": "Bloomberg Podcasts",
       "documents": [
         {
+          "id": "Channel/Bloomberg Podcasts/英伟达暴涨：黄仁勋归来，AI 交易卷土重来 — Bloomberg Podcasts 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/英伟达暴涨：黄仁勋归来，AI 交易卷土重来 — Bloomberg Podcasts 精读报告.html",
+          "title": "英伟达暴涨：黄仁勋归来，AI 交易卷土重来 — Bloomberg Podcasts 精读报告",
+          "sha256": "a7eb6906500eaccb352dec2a92fbc911317d809b0966483df6d0b308c768dd62",
+          "modified": "2026-11-24T10:20:13",
+          "date": "2026.11.24",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
+          "id": "Channel/Bloomberg Podcasts/黄仁勋复职当天：听证、信用卡上限与银行资本松绑 — Bloomberg Podcasts 精读报告.html",
+          "path": "Channel/Bloomberg Podcasts/黄仁勋复职当天：听证、信用卡上限与银行资本松绑 — Bloomberg Podcasts 精读报告.html",
+          "title": "黄仁勋复职当天：听证、信用卡上限与银行资本松绑 — Bloomberg Podcasts 精读报告",
+          "sha256": "9048f3e542b53656a04b90f7ff8cfee102d13de7db44985a793502695ab6aabf",
+          "modified": "2026-11-24T10:19:52",
+          "date": "2026.11.24",
+          "channel": "Bloomberg Podcasts"
+        },
+        {
           "id": "Channel/Bloomberg Podcasts/抛售后反弹与贝森特的美联储增长警告 — Bloomberg Daybreak: US Edition 精读报告.html",
           "path": "Channel/Bloomberg Podcasts/抛售后反弹与贝森特的美联储增长警告 — Bloomberg Daybreak: US Edition 精读报告.html",
           "title": "抛售后反弹与贝森特的美联储增长警告 — Bloomberg Daybreak: US Edition 精读报告",
