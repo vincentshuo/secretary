@@ -25,9 +25,11 @@ test("YouTube opens the channel library and preserves reading selections", async
   await expect(list).toHaveCount(1);
   await expect(list.first().locator(".title")).toHaveText(title!);
   await expect(list.first().getByRole("link", {name:"公开链接"})).toHaveAttribute("href", /^https:\/\/vincentshuo.github.io\/secretary\/youtube\/Channel\//);
-  const popup = page.waitForEvent("popup");
-  await list.first().locator(".title").click();
-  expect((await (await popup).waitForLoadState("domcontentloaded"))).toBeUndefined();
+  const report = list.first().getByRole("link", {name: title!});
+  const reportUrl = (await report.getAttribute("href"))!;
+  const [popup] = await Promise.all([page.waitForEvent("popup"), report.click()]);
+  await expect(popup).toHaveURL(reportUrl);
+  await expect(popup).toHaveTitle(title!.trim());
   await page.goto("/?module=youtube");
   await feed.getByRole("navigation").getByText("精选").click();
   await expect(list.first().locator(".title")).toHaveText(title!);

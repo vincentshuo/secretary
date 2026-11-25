@@ -14,6 +14,9 @@
 //! passes `OPENAI_API_KEY` through. A Finder-launched app has no shell env — there the key
 //! comes from the SecretStore (Settings tab), see `coworker.providers.resolve_api_key`.
 
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
+use std::io::{self, Write};
 use std::path::PathBuf;
 use std::process::{Child, Command, Stdio};
 #[cfg(target_os = "windows")]
@@ -25,7 +28,8 @@ use serde::Serialize;
 use tauri::{
     menu::{Menu, MenuItem},
     tray::TrayIconBuilder,
-    Emitter, Manager, RunEvent, WebviewUrl, WebviewWindowBuilder, WindowEvent,
+    webview::NewWindowResponse,
+    Emitter, Manager, RunEvent, Url, WebviewUrl, WebviewWindowBuilder, WindowEvent,
 };
 use tauri_plugin_autostart::ManagerExt;
 use uuid::Uuid;
@@ -693,6 +697,72 @@ async fn install_update(
     app.restart();
 }
 
+fn open_bundled_report(
+    app: &tauri::AppHandle,
+    url: &Url,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let assets = app.asset_resolver();
+    let path = percent_encoding::percent_decode_str(url.path()).decode_utf8()?;
+    // Tauri resolves missing assets to the SPA entry point, so check the exact key first.
+    let report = assets
+        .iter()
+        .any(|(key, _)| key == path)
+        .then(|| assets.get(url.path().to_owned()))
+        .flatten()
+        .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "Bundled report is missing"))?;
+
+    // External browsers cannot load Tauri's private protocol. Cache the HTML by content so
+    // repeated clicks reuse the file and updated reports get a fresh browser URL.
+    let directory = app.path().app_cache_dir()?.join("youtube-reports");
+    let mut hash = DefaultHasher::new();
+    report.bytes.hash(&mut hash);
+    let html = directory.join(format!("{:016x}.html", hash.finish()));
+    if !html.exists() {
+        std::fs::create_dir_all(&directory)?;
+        let mut file = tempfile::NamedTempFile::new_in(&directory)?;
+        file.write_all(&report.bytes)?;
+        file.persist(&html)?;
+    }
+    open::that_detached(html)?;
+    Ok(())
+}
+
+fn open_youtube_report(
+    app: &tauri::AppHandle,
+    url: &Url,
+) -> Option<Result<(), Box<dyn std::error::Error>>> {
+    let path = url.path();
+    if !path.ends_with(".html") {
+        return None;
+    }
+    if url.scheme() == "https"
+        && url.host_str() == Some("vincentshuo.github.io")
+        && url.port().is_none()
+        && path.starts_with("/secretary/youtube/Channel/")
+    {
+        return Some(open::that_detached(url.as_str()).map_err(Into::into));
+    }
+    if !path.starts_with("/youtube/Channel/") {
+        return None;
+    }
+    if tauri::is_dev()
+        && app
+            .config()
+            .build
+            .dev_url
+            .as_ref()
+            .is_some_and(|dev| url.origin() == dev.origin())
+    {
+        return Some(open::that_detached(url.as_str()).map_err(Into::into));
+    }
+    match (url.scheme(), url.host_str(), url.port()) {
+        ("tauri", Some("localhost"), None) | ("http" | "https", Some("tauri.localhost"), None) => {
+            Some(open_bundled_report(app, url))
+        }
+        _ => None,
+    }
+}
+
 pub fn run() {
     let port = free_port();
     let api_token = launch_token();
@@ -809,6 +879,7 @@ pub fn run() {
 
             // 2. Build the window, injecting the sidecar endpoints before the SPA loads.
             //    Overlay title bar (macOS): traffic lights float over the edge-to-edge UI.
+            let report_app = app.handle().clone();
             let mut builder =
                 WebviewWindowBuilder::new(app, "main", WebviewUrl::App("index.html".into()))
                     .title("Edison")
@@ -821,7 +892,20 @@ pub fn run() {
                     // worked, DMGs didn't. main.tsx guards against drops outside the
                     // composer navigating the page.
                     .disable_drag_drop_handler()
-                    .initialization_script(&inject);
+                    .initialization_script(&inject)
+                    .on_new_window(move |url, _| {
+                        match open_youtube_report(&report_app, &url) {
+                            Some(result) => {
+                                if let Err(error) = result {
+                                    eprintln!("[edison] failed to open YouTube report: {error}");
+                                }
+                                NewWindowResponse::Deny
+                            }
+                            // macOS WebKit previously had no handler to create popup windows.
+                            None if cfg!(target_os = "macos") => NewWindowResponse::Deny,
+                            None => NewWindowResponse::Allow,
+                        }
+                    });
             #[cfg(target_os = "macos")]
             {
                 builder = builder
