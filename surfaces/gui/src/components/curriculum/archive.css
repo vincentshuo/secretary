@@ -51,6 +51,7 @@
 .course-archive-attention { display: flex; align-items: flex-start; gap: 8px; color: var(--warn-ink); background: var(--warn-soft); border-radius: 7px; padding: 10px 12px; font-size: 12px; margin-bottom: 15px; overflow-wrap: anywhere; }
 .course-archive-attention svg { flex-shrink: 0; margin-top: 2px; }
 .course-archive-attention p { margin: 0; }
+.course-archive-attention .course-archive-prepare { margin-left: auto; align-self: center; flex-shrink: 0; color: inherit; }
 .course-archive-list { overflow: auto; flex: 1; min-height: 0; padding-right: 6px; }
 .course-archive-row { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 15px; align-items: center; padding: 15px 0; border-bottom: 1px solid var(--line); }
 .course-archive-row time { color: var(--muted); font: 12px/24px var(--font-mono, monospace); font-variant-numeric: tabular-nums; }

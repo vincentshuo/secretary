@@ -2,15 +2,58 @@
 
 from __future__ import annotations
 
+import logging
 import os
 import threading
+import time
 from pathlib import Path
 
 from fastapi import BackgroundTasks, FastAPI, HTTPException
 from fastapi.responses import Response
 
 from ..curriculum import CourseArchive, generate_notes
-from ..curriculum_sync import export_documents, generate_transcript
+from ..curriculum_login import renew, signing_in, start_scan
+from ..curriculum_sync import (
+    archive_pass,
+    export_documents,
+    generate_transcript,
+    publish_export,
+    record_backup,
+)
+
+log = logging.getLogger(__name__)
+PASS_INTERVAL = 900
+FIRST_PASS_DELAY = 60
+
+
+def _pass(store: CourseArchive, manager) -> None:
+    try:
+        status = archive_pass(store, lambda: manager)
+        if status and status.get("auth_required") and renew(store):
+            archive_pass(store, lambda: manager)
+        publish_export(store)
+    except Exception:
+        log.exception("classroom archive pass failed")
+
+
+def _archive_loop(store: CourseArchive, manager) -> None:
+    time.sleep(FIRST_PASS_DELAY)
+    while True:
+        _pass(store, manager)
+        time.sleep(PASS_INTERVAL)
+
+
+def start_archive_loop(store: CourseArchive, manager) -> threading.Thread | None:
+    """Keep an enabled archive current while the app runs; a fresh archive stays idle."""
+    if os.environ.get("EDISON_CLASSROOM_SYNC") == "0":
+        return None
+    if not store.sync_status("automation").get("enabled"):
+        return None
+    thread = threading.Thread(
+        target=_archive_loop, args=(store, manager), name="classroom-archive", daemon=True
+    )
+    thread.start()
+    return thread
 
 
 def attach_curriculum(app: FastAPI, manager):
@@ -30,16 +73,20 @@ def attach_curriculum(app: FastAPI, manager):
         db.execute(
             "UPDATE recordings SET state='pending', detail='上次整理中断，可重新整理' WHERE state='generating'"
         )
+    start_archive_loop(store, manager)
 
     @app.get("/v1/curriculum/archive")
     def archive():
         result = store.listing()
         if result["automation"].get("enabled"):
-            revision = export_documents(store)["revision"]
-            result["backup"]["current_revision"] = revision
-            if result["backup"].get("revision") != revision:
-                result["backup"]["state"] = "pending"
+            result["backup"] = record_backup(store, export_documents(store)["revision"])
+        result["platform"] = {"signing_in": signing_in()}
         return result
+
+    @app.post("/v1/curriculum/platform/sign-in")
+    def platform_sign_in():
+        start_scan(store, lambda: _pass(store, manager))
+        return {"signing_in": True}
 
     @app.get("/v1/curriculum/occurrence")
     def occurrence(course: str, date: str, first: int, last: int):

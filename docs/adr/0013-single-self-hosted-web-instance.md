@@ -1,6 +1,6 @@
 # Run Edison as one self-hosted web instance
 
-**Status: accepted.** Supersedes the desktop-only delivery of ADR 0004 and ADR 0011.
+**Status: superseded by ADR 0022 (2026-11-23).** Previously superseded the desktop-only delivery of ADR 0004 and ADR 0011.
 
 The YouTube workbench needs to work around the clock, which a laptop cannot. We therefore run the whole of Edison as a single web instance on a server the owner controls, reached by browser from every device, and retire the desktop app instead of keeping two copies. Two copies would double YouTube API quota and model spend and split every library.
 

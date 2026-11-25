@@ -5,17 +5,13 @@ declare const __COWORKER_DEV_TOKEN__: string;
 // Endpoint resolution order: runtime-injected globals (Tauri sets `window.__COWORKER_HTTP__`
 // for its dynamically-chosen sidecar port) → Vite env → the 127.0.0.1:8765 dev default. This
 // keeps a single codebase: browser `npm run dev` hits 8765; the desktop shell hits its sidecar.
-const selfHostedOrigin = (): string | null =>
-  globalThis.location?.protocol === "https:" ? globalThis.location.origin : null;
 const httpBase = (): string =>
   (globalThis as any).__COWORKER_HTTP__ ||
   (import.meta as any).env?.VITE_COWORKER_HTTP ||
-  selfHostedOrigin() ||
   "http://127.0.0.1:8765";
 const wsBase = (): string =>
   (globalThis as any).__COWORKER_WS__ ||
   (import.meta as any).env?.VITE_COWORKER_WS ||
-  (selfHostedOrigin() ? selfHostedOrigin()!.replace(/^https:/, "wss:") : null) ||
   "ws://127.0.0.1:8765";
 const apiToken = (): string =>
   (globalThis as any).__COWORKER_API_TOKEN__ ||
@@ -2562,8 +2558,9 @@ export interface CourseArchiveSnapshot {
   recordings: RecordedClass[];
   courses: { key: string; name: string }[];
   coverage: Record<string, { from: string; through: string; complete: boolean; checked_at?: string }>;
-  automation?: { enabled?: boolean; checked_at?: string; preparing?: string | null; pending?: number; errors?: Record<string, string>; generation_error?: string };
+  automation?: { enabled?: boolean; checked_at?: string; preparing?: string | null; pending?: number; errors?: Record<string, string>; generation_error?: string; auth_required?: boolean };
   backup?: { state?: string; checked_at?: string; files?: number; conflicts?: string[] };
+  platform?: { signing_in?: boolean };
 }
 export interface ClassroomDocument extends ClassroomDocumentSummary { markdown: string; recording_id: string }
 async function curriculumRequest<T>(path: string, init?: RequestInit): Promise<T> {
@@ -2587,6 +2584,8 @@ export async function getOccurrenceDocuments(course: string, date: string, first
   return data;
 }
 export const prepareClassroomDocument = (id: string) => curriculumRequest<{ state: string }>(`recordings/${encodeURIComponent(id)}/prepare`, { method: "POST" });
+// Opens the platform's QR login in Edison's browser; the archive resumes once the owner scans.
+export const signInClassroomPlatform = () => curriculumRequest<{ signing_in: boolean }>("platform/sign-in", { method: "POST" });
 export async function downloadClassroomDocument(id: string, title: string) {
   const response = await fetch(`${httpBase()}/v1/curriculum/documents/${encodeURIComponent(id)}/download`);
   if (!response.ok) throw new Error(`Course archive: ${response.status}`);
@@ -2594,6 +2593,98 @@ export async function downloadClassroomDocument(id: string, title: string) {
   const anchor = document.createElement("a");
   anchor.href = url;
   anchor.download = `${title.replace(/[\\/:*?"<>|]/g, "-")}.md`;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+// Body profile: recorded values stay in the local sidecar; the fitted body arrives as base64 arrays.
+export type BodyKind = "drive" | "indirect" | "reference";
+export type BodyView = "head" | "front" | "back" | "side" | "arm" | "hand";
+export interface BodyField { key: string; label: { zh: string; en: string }; min: number; max: number; unit: string }
+export interface BodyParameter {
+  id: string;
+  name: { zh: string; en: string };
+  as_needed: boolean;
+  kind: BodyKind;
+  group: string;
+  column: "left" | "right";
+  view: BodyView;
+  fields: BodyField[];
+  side_choice?: boolean;
+  how: string;
+  use: string;
+  categories: { name: string; stage: string }[];
+  landmarks: string[];
+  model: string;
+}
+export interface BodyCatalog {
+  parameters: BodyParameter[];
+  landmarks: Record<string, string>;
+  rules: string[];
+  compare: string[];
+  source: string;
+}
+export type BodyEntry = Partial<Record<string, number | string>>;
+export type BodyValues = Record<string, BodyEntry>;
+export interface BodyPath { side: string; closed: boolean; points: [number, number, number][]; below_floor?: boolean }
+export interface BodyRender {
+  fitter: string;
+  vertices: string;
+  bounds: { min: [number, number, number]; max: [number, number, number] };
+  measured: Record<string, Record<string, number>>;
+  residual: Record<string, Record<string, number>>;
+  geometry: Record<string, BodyPath[]>;
+}
+export interface BodyTopology { fitter: string; vertex_count: number; faces: string; masks: Record<string, string> }
+export interface BodySnapshot {
+  id: string;
+  measured_on: string;
+  values: BodyValues;
+  created_at: string;
+  updated_at: string;
+  revisions: number;
+}
+export interface BodyRevision { measured_on: string; values: BodyValues; replaced_at: string }
+export type BodyStatus = { state: "loading" } | { state: "ready"; fitter: string } | { state: "error"; error: string };
+
+export class BodyRequestError extends Error {
+  constructor(readonly status: number, message: string) { super(message); }
+}
+async function bodyRequest<T>(path: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(`${httpBase()}/v1/body/${path}`, init);
+  if (!response.ok) {
+    const detail = await response.json().then(d => d?.detail, () => null);
+    throw new BodyRequestError(response.status, typeof detail === "string" ? detail : `Body profile: ${response.status}`);
+  }
+  return response.json();
+}
+const bodyJson = (method: string, body: unknown, signal?: AbortSignal): RequestInit => ({
+  method,
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(body),
+  signal,
+});
+export const getBodyCatalog = () => bodyRequest<BodyCatalog>("catalog");
+export const getBodyStatus = () => bodyRequest<BodyStatus>("status");
+export const getBodyTopology = () => bodyRequest<BodyTopology>("topology");
+export const fitBody = (values: BodyValues, signal?: AbortSignal) => bodyRequest<BodyRender>("fit", bodyJson("POST", { values }, signal));
+export const getBodyProfile = () => bodyRequest<{ draft: { values: BodyValues; updated_at: string | null }; snapshots: BodySnapshot[] }>("profile");
+export const saveBodyDraft = (values: BodyValues) => bodyRequest<{ values: BodyValues; updated_at: string }>("draft", bodyJson("PUT", { values }));
+export const createBodySnapshot = (measured_on: string, values: BodyValues) => bodyRequest<BodySnapshot>("snapshots", bodyJson("POST", { measured_on, values }));
+export const reviseBodySnapshot = (id: string, measured_on: string, values: BodyValues) =>
+  bodyRequest<BodySnapshot>(`snapshots/${encodeURIComponent(id)}`, bodyJson("PUT", { measured_on, values }));
+export const deleteBodySnapshot = (id: string) => bodyRequest<{ deleted: string }>(`snapshots/${encodeURIComponent(id)}`, { method: "DELETE" });
+export const getBodyRevisions = (id: string) => bodyRequest<{ revisions: BodyRevision[] }>(`snapshots/${encodeURIComponent(id)}/revisions`);
+export const getSnapshotBody = (id: string) => bodyRequest<BodyRender>(`snapshots/${encodeURIComponent(id)}/body`);
+export async function downloadBodyExport() {
+  const response = await fetch(`${httpBase()}/v1/body/export`);
+  if (!response.ok) throw new BodyRequestError(response.status, `Body profile: ${response.status}`);
+  const url = URL.createObjectURL(await response.blob());
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = "edison-body-profile.json";
   document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();

@@ -1,0 +1,18 @@
+Edison
+Copyright (c) 2026 vincentshuo. Licensed under the MIT License (see LICENSE).
+
+This product includes third-party components distributed under their own terms.
+
+Anny 0.6.2 (https://github.com/naver/anny)
+  Copyright (C) 2025 NAVER Corporation. All Rights Reserved.
+  Licensed under the Apache License, Version 2.0. The full licence text ships
+  with the package metadata (anny-0.6.2.dist-info/licenses/LICENSE) in the
+  desktop sidecar. The body profile uses it unmodified at runtime.
+
+  Anny's mesh, rig and shape targets are derived from MakeHuman / MPFB2
+  assets, which their authors released under CC0 1.0 Universal
+  (https://creativecommons.org/publicdomain/zero/1.0/).
+
+  Only Anny's default "anny" topology is used. Its SMPL/SMPL-X topologies and
+  any non-commercial assets are excluded from the source tree and from every
+  build.

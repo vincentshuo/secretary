@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { YouTubeIcon } from "./YouTubeIcon";
 import { Icon } from "./Icon";
+import { useTranslation } from "react-i18next";
 import { ChannelDirectory } from "./ChannelDirectory";
-
-type Surface = "youtube" | "curriculum" | "curriculum-archive";
+import type { Surface } from "../App";
 
 export function Sidebar({
   surface,
@@ -11,13 +11,16 @@ export function Sidebar({
   onOpenYouTube,
   onSelectChannel,
   onOpenCurriculum,
+  onOpenBody,
 }: {
   surface: Surface;
   youtubeChannel: string;
   onOpenYouTube: () => void;
   onSelectChannel: (id: string) => void;
   onOpenCurriculum: () => void;
+  onOpenBody: () => void;
 }) {
+  const { t } = useTranslation();
   const [directory, setDirectory] = useState(false);
   const sidebar = useRef<HTMLElement>(null);
   const switchButton = useRef<HTMLButtonElement>(null);
@@ -85,6 +88,14 @@ export function Sidebar({
         >
           <Icon name="table" size={18} />
           Curriculum
+        </button>
+        <button
+          data-testid="nav-body"
+          className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm ${surface === "body" ? "bg-chromeHover text-ink" : "text-muted hover:bg-chromeHover"}`}
+          onClick={onOpenBody}
+        >
+          <Icon name="body" size={18} />
+          {t("body.module")}
         </button>
       </nav>
     </aside>

@@ -1,6 +1,6 @@
 # Separate workspace access, Google authorization and YouTube content sessions
 
-**Status: accepted (2026-10-19); implementation and production acceptance remain outstanding.**
+**Status: superseded by ADR 0022 (2026-11-23); never implemented.** Edison no longer acquires YouTube content or holds a Google authorization: reports are produced outside the app and published as static files by the Mac watcher, and no server remains to own a content session.
 
 Edison sign-in controls access to the workspace; it does not own background YouTube permissions. The existing connection module exclusively maintains Google authorization. A separate, narrowly scoped content-session module manages an on-demand server browser whose dedicated profile is the persistent source for content acquisition. Independent acquisition workers consume isolated snapshots and cannot overwrite that source. This avoids both dependence on an online personal Mac and competing durable Cookie writers, without adding a second general-purpose authentication guardian.
 

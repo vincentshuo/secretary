@@ -607,96 +607,6 @@ fn show_main(app: &tauri::AppHandle) {
     }
 }
 
-// --- Auto-update (tauri-plugin-updater) -------------------------------------------
-// The GUI drives updates through these commands (same invoke bridge as everything
-// else — no global plugin JS): check, background pre-download, install. Update
-// artifacts are minisign-verified against the pubkey in tauri.conf.json before
-// anything is installed; the manifest lives at the endpoints configured there
-// (download.openworker.com → GitHub Releases).
-
-#[derive(serde::Serialize)]
-struct UpdateInfo {
-    version: String,
-    notes: String,
-}
-
-#[tauri::command]
-async fn check_for_update(_app: tauri::AppHandle) -> Result<Option<UpdateInfo>, String> {
-    // Edison is rebuilt locally. Never install an upstream OpenWorker binary.
-    Ok(None)
-}
-
-/// Update bytes pre-fetched by `download_update`, keyed by version. The GUI kicks the
-/// download off as soon as a release is offered, so clicking "Restart to update" installs
-/// from memory instead of sitting on a multi-minute download behind a spinner.
-struct PendingUpdate(Mutex<Option<(String, Vec<u8>)>>);
-
-#[tauri::command]
-async fn download_update(
-    app: tauri::AppHandle,
-    pending: tauri::State<'_, PendingUpdate>,
-) -> Result<(), String> {
-    use tauri_plugin_updater::UpdaterExt;
-    let updater = app.updater().map_err(|e| e.to_string())?;
-    let Some(update) = updater.check().await.map_err(|e| e.to_string())? else {
-        return Err("no update available".into());
-    };
-    // Periodic re-checks re-invoke this for the same release — the cached bytes stand.
-    // (Guard scope stays sync: a std MutexGuard must not live across an await.)
-    {
-        let slot = pending.0.lock().unwrap();
-        if slot.as_ref().map(|(v, _)| v == &update.version).unwrap_or(false) {
-            return Ok(());
-        }
-    }
-    let bytes = update
-        .download(|_, _| {}, || {})
-        .await
-        .map_err(|e| e.to_string())?;
-    *pending.0.lock().unwrap() = Some((update.version.clone(), bytes));
-    Ok(())
-}
-
-/// Drop the pre-fetched bundle. Invoked on "Later": a dismissed release would
-/// otherwise pin tens of MB in memory for the rest of an app run that can last
-/// weeks. Changing one's mind just re-downloads.
-#[tauri::command]
-fn clear_pending_update(pending: tauri::State<'_, PendingUpdate>) {
-    *pending.0.lock().unwrap() = None;
-}
-
-#[tauri::command]
-async fn install_update(
-    app: tauri::AppHandle,
-    pending: tauri::State<'_, PendingUpdate>,
-) -> Result<(), String> {
-    use tauri_plugin_updater::UpdaterExt;
-    let updater = app.updater().map_err(|e| e.to_string())?;
-    let Some(update) = updater.check().await.map_err(|e| e.to_string())? else {
-        return Err("no update available".into());
-    };
-    // Pre-fetched bytes for this exact version install instantly; a stale or missing
-    // cache falls back to the original blocking download-and-install.
-    let cached = {
-        let mut slot = pending.0.lock().unwrap();
-        match slot.take() {
-            Some((v, bytes)) if v == update.version => Some(bytes),
-            _ => None,
-        }
-    };
-    match cached {
-        Some(bytes) => update.install(bytes).map_err(|e| e.to_string())?,
-        None => update
-            .download_and_install(|_, _| {}, || {})
-            .await
-            .map_err(|e| e.to_string())?,
-    }
-    // Windows never reaches here (the NSIS installer takes over and relaunches).
-    // macOS: the .app was swapped in place — restart into the new version. The tray
-    // Exit path's sidecar kill runs via RunEvent, so no orphaned openworker-server.
-    app.restart();
-}
-
 fn open_bundled_report(
     app: &tauri::AppHandle,
     url: &Url,
@@ -803,11 +713,7 @@ pub fn run() {
             verify_dictation_model,
             mark_dictation_test_passed,
             delete_dictation_model,
-            dictation_level,
-            check_for_update,
-            download_update,
-            clear_pending_update,
-            install_update
+            dictation_level
         ])
         .setup(move |app| {
             // 1. Start the Python server sidecar on the chosen port (inherits our env).
@@ -872,7 +778,6 @@ pub fn run() {
                 None
             };
             app.manage(KeepAwake(Mutex::new(ka)));
-            app.manage(PendingUpdate(Mutex::new(None)));
             // Voice recordings are transient; only the explicitly installed local Whisper model
             // lives in the existing application state directory.
             app.manage(Arc::new(Dictation::new(state_dir().join("models"))));

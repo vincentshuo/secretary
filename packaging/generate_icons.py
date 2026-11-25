@@ -1,11 +1,11 @@
-"""Generate both desktop icon chains from the one approved thinking-guy master."""
+"""Generate the desktop icon chain from the one approved thinking-guy master."""
 from pathlib import Path
 from PIL import Image
 
 root = Path(__file__).resolve().parents[1]
 master = Image.open(root / 'assets/branding/app-icon-mymind.png').convert('RGBA')
 assert master.size == (1024, 1024)
-for relative in ('surfaces/gui/src-tauri/icons', 'desktop/src-tauri/icons'):
+for relative in ('surfaces/gui/src-tauri/icons',):
     target = root / relative
     target.mkdir(parents=True, exist_ok=True)
     master.save(target / 'icon.png')
