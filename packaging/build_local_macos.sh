@@ -2,6 +2,9 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
+if ! command -v cargo >/dev/null && [ -x /opt/homebrew/opt/rustup/bin/cargo ]; then
+  export PATH="/opt/homebrew/opt/rustup/bin:$PATH"
+fi
 
 # Fail if Anny's non-commercial SMPL assets (or the excluded warp runtime) reached a bundle.
 assert_clean_bundle() {
@@ -55,5 +58,37 @@ codesign --verify --strict "$APP"
 assert_clean_bundle "$APP"
 du -sh "$APP"
 if [ "${EDISON_OPEN_APP:-1}" = "1" ]; then
-  open "$APP"
+  applications="$HOME/Applications"
+  installed="$applications/Edison.app"
+  mkdir -p "$applications"
+  staging="$(mktemp -d "$applications/.edison-install.XXXXXX")"
+  trap 'rm -rf "$staging"' EXIT
+  ditto "$APP" "$staging/Edison.app"
+  codesign --verify --strict "$staging/Edison.app"
+
+  swift -e '
+import AppKit
+
+let apps = NSRunningApplication.runningApplications(
+    withBundleIdentifier: "netizen.v6582374.edison"
+)
+for app in apps {
+    guard app.terminate() else { exit(1) }
+}
+let deadline = Date().addingTimeInterval(10)
+while apps.contains(where: { !$0.isTerminated }) {
+    guard Date() < deadline else { exit(1) }
+    RunLoop.current.run(until: Date().addingTimeInterval(0.1))
+}
+'
+  if [ -e "$installed" ]; then
+    mv "$installed" "$staging/previous.app"
+  fi
+  if ! mv "$staging/Edison.app" "$installed"; then
+    if [ -e "$staging/previous.app" ]; then
+      mv "$staging/previous.app" "$installed" || trap - EXIT
+    fi
+    exit 1
+  fi
+  open "$installed"
 fi

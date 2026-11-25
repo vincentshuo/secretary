@@ -29,7 +29,7 @@ macOS 客户端入口是 `surfaces/gui`。
 bash packaging/build_local_macos.sh
 ```
 
-生成并打开 `surfaces/gui/src-tauri/target/release/bundle/macos/Edison.app`。设置 `EDISON_OPEN_APP=0` 可只构建、不启动。发布版本同样使用此本地构建流程，不依赖上游自动更新服务。
+本地构建成功后会更新并打开 `~/Applications/Edison.app`。平时在 Finder 双击这个应用即可。设置 `EDISON_OPEN_APP=0` 可只生成构建产物，发布打包也使用这个模式。
 
 ## 验证
 
