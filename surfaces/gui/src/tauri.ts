@@ -44,7 +44,7 @@ const invoke = async <T>(cmd: string, args?: Record<string, unknown>): Promise<T
   }
 };
 
-const invokeStrict = async <T>(cmd: string, args?: Record<string, unknown>): Promise<T> => {
+export const invokeStrict = async <T>(cmd: string, args?: Record<string, unknown>): Promise<T> => {
   const tauri = (globalThis as any).__TAURI__;
   if (!tauri?.core?.invoke) throw new Error("This feature is available in the desktop app.");
   return (await tauri.core.invoke(cmd, args)) as T;

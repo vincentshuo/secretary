@@ -4,10 +4,10 @@ Edison's product language covers the YouTube reading workbench, Curriculum and t
 
 ## YouTube reading language
 
-- **Report**: A complete, author-designed HTML document in a channel directory. Its relative path identifies it, and its original bytes are served to readers.
+- **Report**: A complete, author-designed HTML document in a channel directory. Edison opens the original local file.
 - **Channel**: A named folder grouping reports. Report update time orders the feed across channels.
-- **Reading state**: Per-browser read and featured selections keyed by report path. Featuring a report marks it read.
-- **Publication**: Edison indexes new reports after the watcher's quiet window and publishes its reading feed to the Edison GitHub Pages site.
+- **Reading state**: Local read and featured selections follow the file across renames and channel moves. Featuring a report marks it read.
+- **Local reading library**: Edison scans the agent’s channel folders on launch and updates its open reading list on filesystem events.
 
 ## Curriculum language
 

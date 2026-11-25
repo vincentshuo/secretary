@@ -13,8 +13,6 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install --extra-index-url https://download.pytorch.org/whl/cpu -e '.[dev,messaging,bedrock,browser]'
-      # The imported host retains its upstream style; lint the integration boundary.
-      - run: python -m compileall -q scripts/daily_signal
       - run: pytest -q
   gui:
     runs-on: ubuntu-latest

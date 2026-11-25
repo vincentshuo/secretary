@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ReportsContext, useLocalCatalog } from "./reports";
 import { YouTubeView } from "./components/YouTubeView";
 import { CurriculumView } from "./components/CurriculumView";
 import { CourseArchiveView } from "./components/curriculum/CourseArchiveView";
@@ -15,6 +16,7 @@ function initialSurface(): Surface {
 }
 
 export function App() {
+  const catalog = useLocalCatalog();
   const [surface, setSurface] = useState<Surface>(initialSurface);
   const [youtubeChannel, setYoutubeChannel] = useState("");
   const [archiveDocument, setArchiveDocument] = useState<string | null>(() =>
@@ -43,7 +45,7 @@ export function App() {
   };
 
   return (
-    <div className="app flex h-screen min-h-0 bg-canvas text-ink">
+    <ReportsContext.Provider value={catalog}><div className="app flex h-screen min-h-0 bg-canvas text-ink">
       <Sidebar
         surface={surface}
         youtubeChannel={youtubeChannel}
@@ -71,6 +73,6 @@ export function App() {
         )}
         {surface === "body" && <BodyView />}
       </main>
-    </div>
+    </div></ReportsContext.Provider>
   );
 }

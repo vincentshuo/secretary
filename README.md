@@ -3,8 +3,7 @@
 Edison 将 YouTube 阅读资料库与课程周览整合在同一工作区。
 
 - 侧边栏 **YouTube** 阅读按频道整理的 HTML 报告，支持未读、已读和精选。
-- 新报告放入 `surfaces/gui/public/youtube/Channel/<频道>/`。运行 `scripts/daily_signal/install_watcher.sh` 安装本机监听器，文件稳定 60 秒后自动重建索引、提交并推送到 secretary/main，由 GitHub Pages 自动更新[公开报告库](https://vincentshuo.github.io/secretary/youtube/)。
-- 索引与监听器移植自 [Daily Signal 78453f1](https://github.com/vincentshuo/daily-signal/tree/78453f125129c99be12c1b956dae64a88a1b2701)。报告原样发布，阅读与精选状态保存在当前浏览器。
+- Agent 将 HTML 写入 `surfaces/gui/public/youtube/Channel/<频道>/`。Edison 在本机监听该目录，打开时自动补齐，点击文章直接打开本地原文。
 
 ## 下载
 

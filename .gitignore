@@ -36,3 +36,6 @@ build/
 
 # Private local modules; excluded from Git and release archives.
 /.local/
+
+# New agent-written reading reports stay on this Mac.
+/surfaces/gui/public/youtube/Channel/**/*.html

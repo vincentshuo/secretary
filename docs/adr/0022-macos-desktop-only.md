@@ -11,3 +11,7 @@ Delivery follows ADR 0011: the app is built locally for Apple Silicon on macOS 1
 - The classroom archive moves from the server's systemd timer to a schedule on the Mac. Server state is migrated back, and server-only code (web login, web origin allowance, server-to-Mac backup) is removed. This work is tracked separately and does not block new desktop features.
 - ADR 0017 and ADR 0018 assumed a server content session that was never built. Edison no longer acquires YouTube content, so both are superseded.
 - Personal data may stay on the machine: a desktop feature should not need a login session or a network round trip.
+
+## Amendment (2026-11-25)
+
+The YouTube reading library now runs entirely on the Mac. The writing agent delivers unique HTML files into the existing channel directories. The desktop application watches those directories while running and scans them again on launch. This retires the publishing watcher, the Pages site and its public article links.

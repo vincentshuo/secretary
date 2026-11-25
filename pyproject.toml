@@ -92,7 +92,7 @@ build-backend = "hatchling.build"
 packages = ["coworker"]
 
 [tool.hatch.build.targets.sdist]
-include = ["coworker", "packaging", "surfaces/gui", "stt", "LICENSE", "NOTICE", "README.md", "docs/upstream", "scripts/daily_signal"]
+include = ["coworker", "packaging", "surfaces/gui", "stt", "LICENSE", "NOTICE", "README.md", "docs/upstream"]
 
 
 [tool.hatch.metadata]

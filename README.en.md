@@ -2,8 +2,6 @@
 
 Edison brings the YouTube reading library and Curriculum into one workspace.
 
-The YouTube module hosts Daily Signal reports. Place original HTML files under `surfaces/gui/public/youtube/Channel/<channel>/`. On macOS, `scripts/daily_signal/install_watcher.sh` installs the 60-second quiet-window watcher. It indexes reports, commits the feed and pushes it to secretary/main for publication on [GitHub Pages](https://vincentshuo.github.io/secretary/youtube/).
-
-Reports retain their original layout. The channel selector and All, Unread, Read and Featured views operate on the index. Reading selections are stored in the current browser.
+The agent writes original HTML reports to `surfaces/gui/public/youtube/Channel/<channel>/`. Edison watches this local folder, scans it on startup, and opens the original files offline. Read and featured selections follow reports when they move or change names.
 
 See the [project README](README.md) for build and development instructions.
