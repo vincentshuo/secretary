@@ -16,3 +16,16 @@ Anny 0.6.2 (https://github.com/naver/anny)
   Only Anny's default "anny" topology is used. Its SMPL/SMPL-X topologies and
   any non-commercial assets are excluded from the source tree and from every
   build.
+
+Body Profile uses Arwes GridLines and FrameCorners from @arwes/react-bgs and
+@arwes/react-frames 1.0.0-next.25020502 (https://github.com/arwes/arwes).
+The MIT notice is distributed in public/licenses/arwes-MIT.txt. The local
+Cormorant Garamond italic title uses the SIL Open Font License in
+public/licenses/cormorant-garamond-OFL.txt.
+
+Body Profile also bundles CC0 MakeHuman System Assets from
+https://static.makehumancommunity.org/assets/assetpacks/makehuman_system_assets.html
+(young_asian_male, HighPolyEyes with brown irises, eyebrow001, short01, and male_casualsuit06).
+Their geometry and hm08 attachment data are converted by
+scripts/prepare_body_appearance.py. The CC0 terms ship in
+public/licenses/makehuman-CC0.txt.

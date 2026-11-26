@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   createBodySnapshot,
@@ -20,6 +20,7 @@ import {
   type BodyValues,
 } from "../api";
 import { Icon } from "./Icon";
+import { GarmentPlate, inView, type AtlasView } from "./body/GarmentPlate";
 import { BodyStage } from "./body/BodyStage";
 import { HistoryPanel } from "./body/HistoryPanel";
 import { ParameterCard, ParameterLabel } from "./body/ParameterCard";
@@ -36,8 +37,9 @@ const DRAFT_DELAY = 700;
 const HOVER_DWELL = 140;
 
 export function BodyView() {
-  const { t, i18n } = useTranslation();
-  const lang = i18n.language.startsWith("zh") ? "zh" : "en";
+  const { t } = useTranslation(undefined, { lng: "zh" });
+  const lang = "zh";
+  const [view, setView] = useState<AtlasView>("全身总览");
   const [catalog, setCatalog] = useState<BodyCatalog | null>(null);
   const [status, setStatus] = useState<BodyStatus>({ state: "loading" });
   const [topology, setTopology] = useState<BodyTopology | null>(null);
@@ -205,6 +207,13 @@ export function BodyView() {
   const exportProfile = () => downloadBodyExport().catch(fail);
 
   const parameters = catalog?.parameters ?? [];
+  const visible = useMemo(() => (catalog?.parameters ?? []).filter(p => inView(p.id, view)), [catalog, view]);
+  const selectView = (next: AtlasView) => {
+    window.clearTimeout(hoverTimer.current);
+    setHovered(null);
+    if (pinned && !inView(pinned, next)) setPinned(null);
+    setView(next);
+  };
   const count = values ? recordedCount(parameters, values) : 0;
   const ghostSnapshot = snapshots.find(s => s.id === ghostId);
   const loadingText = status.state === "error" ? t("body.model_error", { error: status.error }) : t("body.model_loading");
@@ -212,13 +221,18 @@ export function BodyView() {
   return (
     <div className="body-view" data-testid="body-view">
       <BodyStage
-        parameters={parameters}
+        parameters={visible}
+        view={view}
+        loadingText={loadingText}
         topology={topology}
         render={render}
         ghost={ghost}
         ghostChanges={ghostSnapshot && values ? changes(parameters, values, ghostSnapshot.values) : {}}
         focus={focus}
         expanded={pinned}
+        landmarks={view === "裤装" ? ["E05", "E08", "H09", "H13"] :
+          view === "上装" ? ["B07", "C08", "E01", "F12"] : ["C03", "C08", "E08", "H13"]}
+        onSelect={setPinned}
         onHover={hover}
         onDismiss={() => setPinned(null)}
         label={(p, open) => (
@@ -247,7 +261,7 @@ export function BodyView() {
       >
         <header className="body-header">
           <div className="body-title">
-            <h2>{t("body.module")}</h2>
+            <h2 lang="en">Body Profile</h2>
             <span>{t("body.recorded", { count, total: parameters.length || 22 })}</span>
             <span className={`body-draft-state state-${editing ? "editing" : draftState}`} aria-live="polite">
               {editing ? t("body.editing_hint") : draftState === "idle" ? t("body.draft_local") : t(`body.draft_${draftState}`)}
@@ -268,6 +282,12 @@ export function BodyView() {
             >{t("body.save")}</button>
           </div>
         </header>
+        <nav className="atlas-nav" aria-label="量体用途">
+          {(["全身总览", "上装", "裤装"] as const).map(tab => <button key={tab} aria-pressed={tab === view}
+            onClick={() => selectView(tab)}>{tab}</button>)}
+          <span>量体单位 · cm</span>
+        </nav>
+        <GarmentPlate view={view} active={parameters.find(p => p.id === focus)} onView={selectView}/>
         {editing && (
           <div className="body-banner" role="status">
             <span>{t("body.editing", { date: snapshots.find(s => s.id === editing.id)?.measured_on })}</span>
@@ -293,7 +313,6 @@ export function BodyView() {
             <button type="button" aria-label={t("body.close")} onClick={() => setProblem(null)}><Icon name="x" size={12} /></button>
           </div>
         )}
-        {!render && <div className="body-veil" role="status">{loadingText}</div>}
         {history && (
           <HistoryPanel
             parameters={parameters}
@@ -305,7 +324,7 @@ export function BodyView() {
             onGhost={setGhostId}
             onRevise={s => { setEditing({ id: s.id, measured_on: s.measured_on, values: s.values }); setHistory(false); }}
             onDelete={s => setDialog({ kind: "delete", snapshot: s })}
-            onFocus={pid => setPinned(pid)}
+            onFocus={pid => { if (!inView(pid, view)) selectView("全身总览"); setPinned(pid); }}
             onClose={() => setHistory(false)}
           />
         )}

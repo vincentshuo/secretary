@@ -1,3 +1,4 @@
+import base64
 import os
 import stat
 from pathlib import Path
@@ -104,6 +105,11 @@ def test_render_fits_recorded_values_and_draws_reference_layers(service):
     assert {"D11", "D12", "H18", "H15", "F13"} <= set(out["geometry"])
     assert set(out["measured"]) >= DRIVE
     assert len(out["vertices"]) > 0
+    assert len(out["geometry"]["F05"]) == 2
+    for route in out["geometry"]["F05"]:
+        assert len(route["landmarks"]) == 4
+        assert route["landmarks"][0] == route["points"][0]
+        assert route["landmarks"][-1] == route["points"][-1]
 
 
 def test_body_routes_round_trip_through_the_archive(tmp_path, service):
@@ -118,7 +124,10 @@ def test_body_routes_round_trip_through_the_archive(tmp_path, service):
     with TestClient(app) as client:
         assert len(client.get("/v1/body/catalog").json()["parameters"]) == 22
         assert client.get("/v1/body/status").json()["state"] == "ready"
-        assert client.get("/v1/body/topology").json()["vertex_count"] > 10000
+        topology = client.get("/v1/body/topology").json()
+        assert topology["vertex_count"] > 10000
+        base_vertices = base64.b64decode(topology["base_vertices"])
+        assert len(base_vertices) == topology["vertex_count"] * 4
         assert client.put("/v1/body/draft", json={"values": SAMPLE}).status_code == 200
         snap = client.post("/v1/body/snapshots", json={"measured_on": "2026-11-20", "values": SAMPLE}).json()
         ghost = client.get(f"/v1/body/snapshots/{snap['id']}/body").json()

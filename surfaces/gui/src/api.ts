@@ -2628,7 +2628,7 @@ export interface BodyCatalog {
 }
 export type BodyEntry = Partial<Record<string, number | string>>;
 export type BodyValues = Record<string, BodyEntry>;
-export interface BodyPath { side: string; closed: boolean; points: [number, number, number][]; below_floor?: boolean }
+export interface BodyPath { side: string; closed: boolean; points: [number, number, number][]; landmarks?: [number, number, number][]; below_floor?: boolean }
 export interface BodyRender {
   fitter: string;
   vertices: string;
@@ -2637,7 +2637,15 @@ export interface BodyRender {
   residual: Record<string, Record<string, number>>;
   geometry: Record<string, BodyPath[]>;
 }
-export interface BodyTopology { fitter: string; vertex_count: number; faces: string; masks: Record<string, string> }
+export interface BodyTopology {
+  fitter: string;
+  vertex_count: number;
+  faces: string;
+  masks: Record<string, string>;
+  uv?: string;
+  face_uv?: string;
+  base_vertices?: string;
+}
 export interface BodySnapshot {
   id: string;
   measured_on: string;

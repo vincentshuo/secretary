@@ -48,7 +48,7 @@ def _sides(lo, hi):
 
 PARAMETERS: list[dict] = [
     {
-        "id": "B01", "name": {"zh": "帽位头围", "en": "Hat-line head girth"}, "as_needed": True,
+        "id": "B01", "name": {"zh": "帽口线头围", "en": "Hat-line head girth"}, "as_needed": True,
         "kind": INDIRECT, "group": "head", "column": "left", "view": "head", "fields": _value(45, 70),
         "how": "沿帽口预计经过的眉上、耳上、后脑路线绕一圈，贴合不勒；记录路线与发型。",
         "use": "对照帽子的头围范围；帽深与头型适配靠试戴确认。",
@@ -56,7 +56,7 @@ PARAMETERS: list[dict] = [
         "model": "以头部宽度、深度与饱满度形变近似；模型无头发。",
     },
     {
-        "id": "B07", "name": {"zh": "领位颈净围", "en": "Collar neck girth"}, "as_needed": True,
+        "id": "B07", "name": {"zh": "领座线颈围", "en": "Collar neck girth"}, "as_needed": True,
         "kind": DRIVE, "group": "head", "column": "right", "view": "front", "fields": _value(28, 55),
         "how": "在衬衫领座对应位置、通常喉结下方绕一圈，头自然，不塞手指。",
         "use": "对照衬衫的人体颈围表。成衣领围需留舒适空间，依品牌说明判断。",
@@ -64,7 +64,7 @@ PARAMETERS: list[dict] = [
         "model": "在喉结下方、前低后高的领座线上量取。",
     },
     {
-        "id": "C03", "name": {"zh": "背肩表面宽", "en": "Back shoulder surface width"}, "as_needed": False,
+        "id": "C03", "name": {"zh": "后肩宽（沿体表）", "en": "Back shoulder surface width"}, "as_needed": False,
         "kind": DRIVE, "group": "torso", "column": "left", "view": "back", "fields": _value(30, 70),
         "how": "从左肩端沿后肩／上背表面直接量到右肩端，不绕经后颈；保存路线。",
         "use": "为正常肩款提供身体参照；不能直接等同成衣平铺肩宽。",
@@ -72,7 +72,7 @@ PARAMETERS: list[dict] = [
         "model": "沿上背表面从右肩端到左肩端，软尺跨过肩胛间的凹陷。",
     },
     {
-        "id": "C04", "name": {"zh": "左右单肩长", "en": "Single shoulder length"}, "as_needed": True,
+        "id": "C04", "name": {"zh": "单肩长", "en": "Single shoulder length"}, "as_needed": True,
         "kind": INDIRECT, "group": "torso", "column": "right", "view": "front", "fields": _sides(8, 22),
         "how": "从侧颈点沿肩部量到同侧肩端，左右分别记录。",
         "use": "常遇到肩缝不合适、左右差异时辅助判断；购物优先比较合身衣物的肩宽。",
@@ -99,7 +99,7 @@ PARAMETERS: list[dict] = [
         "model": "采用 Anny 自带的人体测量腰线。",
     },
     {
-        "id": "E05", "name": {"zh": "实际裤腰净围", "en": "Trouser waistband girth"}, "as_needed": False,
+        "id": "E05", "name": {"zh": "裤腰位人体净围", "en": "Trouser waistband girth"}, "as_needed": False,
         "kind": INDIRECT, "group": "torso", "column": "left", "view": "front", "fields": _value(50, 160),
         "how": "穿一条腰位合适的裤子标出腰头位置，脱下后沿对应身体路线测量；高、中、低腰分开记。",
         "use": "裤子选码的主要身体参照；先确认品牌表格给的是身体腰围还是成衣腰围。",
@@ -123,7 +123,7 @@ PARAMETERS: list[dict] = [
         "model": "取裆部以上、裤腰线以下最丰满的水平截面。",
     },
     {
-        "id": "F03", "name": {"zh": "肩端至腕长", "en": "Shoulder-to-wrist length"}, "as_needed": False,
+        "id": "F03", "name": {"zh": "肩点至腕长（经肘）", "en": "Shoulder-to-wrist length"}, "as_needed": False,
         "kind": DRIVE, "group": "arm", "column": "right", "view": "arm", "fields": _sides(40, 85),
         "how": "手臂屈肘约 90°，从肩端经肘外侧到腕部终点量连续长度；记录姿势。",
         "use": "对照采用同路线的身体袖长表；商家要求自然垂臂时另测。",
@@ -131,7 +131,7 @@ PARAMETERS: list[dict] = [
         "model": "模型为自然站姿，以肩端—肘外侧—腕部终点的两段骨段路径近似屈肘长度。",
     },
     {
-        "id": "F05", "name": {"zh": "后颈至腕长", "en": "Nape-to-wrist length"}, "as_needed": True,
+        "id": "F05", "name": {"zh": "后颈点至腕长（经肘）", "en": "Nape-to-wrist length"}, "as_needed": True,
         "kind": INDIRECT, "group": "arm", "column": "right", "view": "back", "fields": _sides(60, 110),
         "how": "从后颈经肩端、肘外侧到腕部，固定并记录屈肘姿势。",
         "use": "用于以后颈为起点的衬衫袖长表；不能与 F03 混用。",
@@ -139,7 +139,7 @@ PARAMETERS: list[dict] = [
         "model": "后颈点沿肩上表面到肩端，再接 F03 的骨段路径。",
     },
     {
-        "id": "F07", "name": {"zh": "放松上臂最大围", "en": "Relaxed upper-arm girth"}, "as_needed": True,
+        "id": "F07", "name": {"zh": "上臂最大围（放松）", "en": "Relaxed upper-arm girth"}, "as_needed": True,
         "kind": DRIVE, "group": "arm", "column": "right", "view": "arm", "fields": _sides(18, 55),
         "how": "手臂自然放松，在上臂最丰满处绕一圈，软尺不斜绕。",
         "use": "肩胸合适但袖子偏紧时，检查袖肥。",
@@ -155,9 +155,9 @@ PARAMETERS: list[dict] = [
         "model": "垂直于前臂轴线，取腕部附近最细的截面。",
     },
     {
-        "id": "F13", "name": {"zh": "戴表后的袖口需求", "en": "Cuff room over a watch"}, "as_needed": True,
+        "id": "F13", "name": {"zh": "佩表腕围", "en": "Cuff room over a watch"}, "as_needed": True,
         "kind": REFERENCE, "group": "arm", "column": "right", "view": "hand",
-        "fields": [_f("girth", "带表外包络围", "Envelope girth", 12, 35)],
+        "fields": [_f("girth", "佩表外周长", "Envelope girth", 12, 35)],
         "side_choice": True,
         "how": "记录戴表侧、佩戴位置及带表后的外包络围；同时试穿参考衬衫。",
         "use": "判断袖口能否覆盖手表、屈腕是否受阻；不覆盖腕部净围。",
@@ -183,7 +183,7 @@ PARAMETERS: list[dict] = [
         "landmarks": [], "model": "垂直于小腿轴线，取小腿上半段最粗的截面。",
     },
     {
-        "id": "H15", "name": {"zh": "靴口处腿围", "en": "Boot-top leg girth"}, "as_needed": True,
+        "id": "H15", "name": {"zh": "靴口高度处腿围", "en": "Boot-top leg girth"}, "as_needed": True,
         "kind": REFERENCE, "group": "leg", "column": "left", "view": "side",
         "fields": [_f("girth", "腿围", "Girth", 18, 60), _f("height", "靴口离地高度", "Boot-top height", 8, 60)],
         "how": "在目标靴筒口位置绕腿一圈，位置与围度一起记；裤腿塞靴内时穿目标裤子另量。",
@@ -208,9 +208,9 @@ PARAMETERS: list[dict] = [
         "model": "从后颈点沿后中线量出长度，画出后下摆参考线，不改变人体。",
     },
     {
-        "id": "H18", "name": {"zh": "目标裤外长／内长", "en": "Target outseam / inseam"}, "as_needed": False,
+        "id": "H18", "name": {"zh": "目标裤外长与内长", "en": "Target outseam / inseam"}, "as_needed": False,
         "kind": REFERENCE, "group": "target", "column": "left", "view": "side",
-        "fields": [_f("outseam", "外长", "Outseam", 40, 130), _f("inseam", "内长", "Inseam", 30, 110)],
+        "fields": [_f("outseam", "裤外长（腰侧至裤脚）", "Outseam", 40, 130), _f("inseam", "裤内长（裆底至裤脚）", "Inseam", 30, 110)],
         "how": "穿目标鞋，用一条腰位合适的裤子确定裤脚位置，再按商家路线测外长和内长。",
         "use": "判断九分、无堆积、轻微堆积等效果；腰位、鞋型不同可保留多个目标。",
         "categories": [{"name": "裤子／牛仔裤／短裤", "stage": "先看"}], "landmarks": ["实际裤腰线"],

@@ -69,7 +69,8 @@ class BodyService:
             self.fitter = Fitter(self.model, self.measures)
             self.display_keys = Evaluator(self.measures)
             self._pose = self._display_pose()
-            self._faces = self._visible_faces()
+            self._face_mask = self._visible_face_mask()
+            self._faces = self.model.faces[self._face_mask].astype(np.uint32)
             self._masks = self._highlight_masks()
         except Exception as exc:  # surfaced through status(); the rest of Edison keeps running
             self.error = f"{type(exc).__name__}: {exc}"
@@ -107,9 +108,9 @@ class BodyService:
         ids = [i for i, n in enumerate(self.model.bone_labels) if n.startswith(prefixes)]
         return np.isin(self.model.dominant_bone(), ids)
 
-    def _visible_faces(self) -> np.ndarray:
+    def _visible_face_mask(self) -> np.ndarray:
         eyes = self._bones("eye")
-        return self.model.faces[~eyes[self.model.faces].any(1)].astype(np.uint32)
+        return ~eyes[self.model.faces].any(1)
 
     def _highlight_masks(self) -> dict[str, np.ndarray]:
         shape = Shape.neutral()
@@ -139,10 +140,14 @@ class BodyService:
 
     def topology(self) -> dict:
         self.wait()
+        model = self.model.anny
         return {
             "fitter": VERSION,
             "vertex_count": int(self.model.template.shape[0]),
             "faces": b64(self._faces),
+            "uv": b64(model.texture_coordinates.cpu().numpy().astype("<f4")),
+            "face_uv": b64(model.face_texture_coordinate_indices.cpu().numpy()[self._face_mask].astype("<u4")),
+            "base_vertices": b64(model.base_mesh_vertex_indices.cpu().numpy().astype("<u4")),
             "masks": {k: b64(m) for k, m in self._masks.items()},
         }
 
@@ -180,9 +185,12 @@ class BodyService:
         measured, targets = info["measured"], info["targets"]
         geometry: dict[str, list] = {}
         for (pid, side), (pts, closed) in shown.items():
-            geometry.setdefault(pid, []).append(
-                {"side": side, "closed": closed, "points": three(pts).round(4).tolist()}
-            )
+            path = {"side": side, "closed": closed, "points": three(pts).round(4).tolist()}
+            if pid == "F05":
+                marks = self.measures.landmarks
+                indices = [marks["C7"], marks[f"AC.{side}"], marks[f"EL.{side}"], marks[f"WR.{side}"]]
+                path["landmarks"] = three(posed[indices].numpy()).round(4).tolist()
+            geometry.setdefault(pid, []).append(path)
         layers = self._reference_layers(values, rest.numpy(), posed.numpy(), shape)
         for pid, items in layers.items():
             geometry[pid] = items

@@ -21,7 +21,7 @@ export function ParameterLabel({
   lang: Lang;
   onToggle: () => void;
 }) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(undefined, { lng: "zh" });
   const shown = readings(p, entry, render, lang);
   const gap = shortfall(p, render);
   return (
@@ -30,6 +30,7 @@ export function ParameterLabel({
       <span className="body-label-name">{p.name[lang]}</span>
       <span className="body-label-value">
         <Summary parameter={p} shown={shown} entry={entry} />
+        {shown.some(r => r.source === "recorded") && <em>{p.group === "target" ? "目标" : "实测"}{shown.some(r => r.source === "mirrored") && "／对侧参照"}</em>}
         {gap && <span className="body-label-warn" title={t("body.shortfall_short")}>!</span>}
       </span>
     </button>
@@ -37,7 +38,7 @@ export function ParameterLabel({
 }
 
 function Summary({ parameter: p, shown, entry }: { parameter: BodyParameter; shown: Reading[]; entry: BodyEntry | undefined }) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(undefined, { lng: "zh" });
   const known = shown.filter(r => r.value !== null);
   if (!known.length) return <span className="is-empty">{p.kind === "reference" ? t("body.reference_unset") : "—"}</span>;
   const inferred = known.every(r => r.source === "inferred");
@@ -86,7 +87,7 @@ export function ParameterCard({
   onChange: (key: string, value: number | string | null) => void;
   onClose: () => void;
 }) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(undefined, { lng: "zh" });
   const [help, setHelp] = useState(false);
   const shown = readings(p, entry, render, lang);
   const gap = shortfall(p, render);
@@ -149,7 +150,7 @@ function FieldInput({ field, lang, value, reading, onCommit }: {
   reading: Reading;
   onCommit: (v: number | null) => void;
 }) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(undefined, { lng: "zh" });
   const [text, setText] = useState(value === null ? "" : String(value));
   const parsed = parseField(field, text);
   const invalid = Number.isNaN(parsed);
@@ -243,7 +244,7 @@ function Help({ id, parameter: p, catalog }: { id: string; parameter: BodyParame
         </section>
       )}
       <section className="body-help-model">
-        <h4>全息模型中</h4>
+        <h4>人体模型中的测量路径</h4>
         <p>{p.model}</p>
       </section>
     </div>

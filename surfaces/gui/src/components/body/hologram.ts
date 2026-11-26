@@ -1,67 +1,28 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
-import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
-import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import { Line2 } from "three/examples/jsm/lines/Line2.js";
 import { LineGeometry } from "three/examples/jsm/lines/LineGeometry.js";
 import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
+import { measurementLandmarks, measurementLine } from "./measurementLine";
 import type { BodyPath, BodyView } from "../../api";
+import { applySkinTextures, bodyAnchors, loadHead, loadOutfit, skinGeometry, type HeadMesh, type Outfit, type SurfaceTopology } from "./appearance";
 
-const BASE = new THREE.Color("#6fdcff");
-const HOT = new THREE.Color("#ffb347");
-const CHANGED = new THREE.Color("#ff5fa8");
-const GHOST = new THREE.Color("#b49bff");
+const BASE = new THREE.Color("#7b9fa7");
+const HOT = new THREE.Color("#c25c35");
+const CHANGED = new THREE.Color("#be5875");
+const GHOST = new THREE.Color("#9c83c8");
 const FOV = 28;
-const MORPH_MS = 520;
 const GLOW_MS = 260;
 const CAMERA_MS = 900;
 
 const bodyVertex = /* glsl */ `
-  attribute float glow;
-  attribute float change;
   varying vec3 vNormal;
   varying vec3 vView;
-  varying float vGlow;
-  varying float vChange;
-  varying float vHeight;
   void main() {
-    vec4 world = modelMatrix * vec4(position, 1.0);
-    vec4 view = viewMatrix * world;
+    vec4 view = modelViewMatrix * vec4(position, 1.0);
     vNormal = normalize(normalMatrix * normal);
     vView = normalize(-view.xyz);
-    vGlow = glow;
-    vChange = change;
-    vHeight = world.y;
     gl_Position = projectionMatrix * view;
-  }
-`;
-
-const bodyFragment = /* glsl */ `
-  uniform float time;
-  uniform float motion;
-  uniform float intensity;
-  uniform vec3 base;
-  uniform vec3 hot;
-  uniform vec3 changed;
-  uniform vec2 span;
-  varying vec3 vNormal;
-  varying vec3 vView;
-  varying float vGlow;
-  varying float vChange;
-  varying float vHeight;
-  void main() {
-    float facing = clamp(abs(dot(normalize(vNormal + 1e-6), normalize(vView))), 0.0, 1.0);
-    float rim = pow(1.0 - facing, 2.3);
-    float lines = smoothstep(0.62, 1.0, 0.5 + 0.5 * sin(vHeight * 330.0 - time * 1.4 * motion));
-    float h = (vHeight - span.x) / max(span.y - span.x, 0.001);
-    float band = (fract(time * 0.07) * 1.4 - 0.2 - h) * 9.0;
-    float sweep = motion * exp(-band * band);
-    vec3 color = base * (0.03 + rim * 0.62 + lines * 0.05 + sweep * 0.18);
-    color = mix(color, hot * (0.32 + rim * 1.1 + lines * 0.08), clamp(vGlow, 0.0, 1.0));
-    color = mix(color, changed * (0.2 + rim * 0.75), clamp(vChange, 0.0, 1.0) * (1.0 - clamp(vGlow, 0.0, 1.0)));
-    gl_FragColor = vec4(color * intensity, 1.0);
   }
 `;
 
@@ -69,58 +30,10 @@ const ghostFragment = /* glsl */ `
   uniform vec3 base;
   varying vec3 vNormal;
   varying vec3 vView;
-  varying float vGlow;
-  varying float vChange;
-  varying float vHeight;
   void main() {
     float rim = pow(1.0 - clamp(abs(dot(normalize(vNormal + 1e-6), normalize(vView))), 0.0, 1.0), 1.8);
-    gl_FragColor = vec4(base * (0.05 + rim * 0.55), 1.0);
+    gl_FragColor = vec4(base, rim * 0.75);
   }
-`;
-
-const particleVertex = /* glsl */ `
-  attribute float phase;
-  uniform float time;
-  uniform float motion;
-  uniform vec2 span;
-  varying float vAlpha;
-  void main() {
-    float height = span.y - span.x;
-    float t = fract(phase + time * 0.018 * motion);
-    vec3 p = position;
-    p.y = span.x + t * height * 1.05;
-    vAlpha = sin(t * 3.14159) * 0.55;
-    vec4 view = modelViewMatrix * vec4(p, 1.0);
-    gl_PointSize = 2.2 * (3.0 / -view.z);
-    gl_Position = projectionMatrix * view;
-  }
-`;
-
-const particleFragment = /* glsl */ `
-  uniform vec3 base;
-  varying float vAlpha;
-  void main() {
-    float d = length(gl_PointCoord - 0.5);
-    gl_FragColor = vec4(base * vAlpha * (1.0 - smoothstep(0.0, 0.5, d)), 1.0);
-  }
-`;
-
-const floorFragment = /* glsl */ `
-  uniform vec3 base;
-  varying vec2 vUv;
-  void main() {
-    float r = length(vUv - 0.5) * 2.0;
-    if (r > 1.0) discard;
-    float rings = (1.0 - smoothstep(0.0, 0.035, abs(fract(r * 6.0) - 0.5) - 0.46)) * (1.0 - r);
-    float edge = 1.0 - smoothstep(0.0, 0.012, abs(r - 0.94));
-    float pool = (1.0 - smoothstep(0.0, 0.85, r)) * 0.12;
-    gl_FragColor = vec4(base * (rings * 0.16 + edge * 0.5 + pool), 1.0);
-  }
-`;
-
-const floorVertex = /* glsl */ `
-  varying vec2 vUv;
-  void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }
 `;
 
 function heightRange(v: Float32Array) {
@@ -146,7 +59,21 @@ export function standTo(body: Float32Array, like: Float32Array) {
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
 type Tween = { start: number; duration: number };
-type PathLayer = { pid: string; line: Line2; reference: boolean };
+type PathLayer = { pid: string; line: Line2; reference: boolean; marks?: ReturnType<typeof measurementLandmarks> };
+type CameraFrame = { position: THREE.Vector3; target: THREE.Vector3 };
+export type BodyPreview = "loading" | "ready" | "fallback";
+
+export function orbitFrame(from: CameraFrame, to: CameraFrame, t: number, minimumRadius: number) {
+  const start = new THREE.Spherical().setFromVector3(from.position.clone().sub(from.target));
+  const end = new THREE.Spherical().setFromVector3(to.position.clone().sub(to.target));
+  const turn = Math.atan2(Math.sin(end.theta - start.theta), Math.cos(end.theta - start.theta));
+  const radius = Math.max(minimumRadius, THREE.MathUtils.lerp(start.radius, end.radius, t));
+  const target = from.target.clone().lerp(to.target, t);
+  const position = new THREE.Vector3().setFromSphericalCoords(
+    radius, THREE.MathUtils.lerp(start.phi, end.phi, t), start.theta + turn * t,
+  ).add(target);
+  return { target, position };
+}
 
 const VIEW_DIRECTION: Record<BodyView, THREE.Vector3> = {
   front: new THREE.Vector3(0, 0.04, 1),
@@ -160,44 +87,80 @@ const VIEW_DIRECTION: Record<BodyView, THREE.Vector3> = {
 export class Hologram {
   readonly canvas: HTMLCanvasElement;
   onFrame: (() => void) | null = null;
+  onPreview: ((state: BodyPreview) => void) | null = null;
+  private preview: BodyPreview = "loading";
   private renderer: THREE.WebGLRenderer;
   private scene = new THREE.Scene();
   private camera = new THREE.PerspectiveCamera(FOV, 1, 0.05, 30);
   private controls: OrbitControls;
-  private composer: EffectComposer;
-  private bloom: UnrealBloomPass;
-  private clock = new THREE.Clock();
   private geometry = new THREE.BufferGeometry();
   private ghostGeometry = new THREE.BufferGeometry();
-  private bodyMaterial: THREE.ShaderMaterial;
+  private bodyMaterial: THREE.MeshStandardMaterial;
+  private skin: ReturnType<typeof skinGeometry> | null = null;
+  private head: HeadMesh[] = [];
+  private outfit: Outfit | null = null;
+  private surface?: SurfaceTopology;
+  private faces = new Uint32Array();
+  private coverage: number[] = [];
+  private depthScene = new THREE.Scene();
+  private depthMaterial = new THREE.MeshBasicMaterial({ colorWrite: false });
+  private depthTarget = new THREE.WebGLRenderTarget(1, 1, {
+    depthTexture: new THREE.DepthTexture(1, 1),
+  });
+  private depthViewport = new THREE.Vector2();
+  private appearanceRequest = new AbortController();
+  private contact = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 1.2), new THREE.ShaderMaterial({
+    uniforms: { feet: { value: [new THREE.Vector2(), new THREE.Vector2()] } },
+    vertexShader: `
+      varying vec2 ground;
+      void main() {
+        ground = (modelMatrix * vec4(position, 1.0)).xz;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      uniform vec2 feet[2];
+      varying vec2 ground;
+      void main() {
+        vec2 a = (ground - feet[0]) / vec2(0.07, 0.15);
+        vec2 b = (ground - feet[1]) / vec2(0.07, 0.15);
+        float shadow = exp(-dot(a,a) * 2.0) + exp(-dot(b,b) * 2.0);
+        float radius = length(ground);
+        float thickness = max(fwidth(radius), 0.001);
+        float inner = 1.0 - smoothstep(thickness, thickness * 2.0, abs(radius - 0.25));
+        float outer = 1.0 - smoothstep(thickness, thickness * 2.0, abs(radius - 0.32));
+        float sweep = sin(atan(ground.y, ground.x) * 24.0);
+        float projection = (inner * 0.34 + outer * step(0.45, sweep) * 0.24);
+        gl_FragColor = vec4(0.16, 0.55, 0.65, clamp(shadow * 0.34 + projection, 0.0, 1.0));
+      }
+    `,
+    transparent: true,
+    depthWrite: false,
+  }));
   private ghostMaterial: THREE.ShaderMaterial;
-  private particleMaterial: THREE.ShaderMaterial;
   private body: THREE.Mesh | null = null;
   private ghost: THREE.Mesh | null = null;
-  private occluder: THREE.Mesh | null = null;
-  private floor: THREE.Mesh | null = null;
-  private particles: THREE.Points | null = null;
+  private change = new Float32Array();
+  private highlight = new Float32Array();
   private paths = new THREE.Group();
   private layers: PathLayer[] = [];
   private masks: Record<string, Uint8Array> = {};
-  private from: Float32Array | null = null;
   private target: Float32Array | null = null;
-  private morph: Tween | null = null;
   private glowFrom: Float32Array | null = null;
   private glowTarget: Float32Array | null = null;
   private glowTween: Tween | null = null;
-  private pendingPaths: Record<string, BodyPath[]> | null = null;
+  private displayPaths: Record<string, BodyPath[]> = {};
   private ghostTarget: Float32Array | null = null;
   private changed: Record<string, number> = {};
   private cameraFrom: { position: THREE.Vector3; target: THREE.Vector3 } | null = null;
   private cameraTo: { position: THREE.Vector3; target: THREE.Vector3 } | null = null;
   private cameraTween: Tween | null = null;
   private home: { position: THREE.Vector3; target: THREE.Vector3 } | null = null;
-  private span = new THREE.Vector2(0, 1.8);
   private focus: string | null = null;
+  private focusView: BodyView | null = null;
+  private bodyRadius = 0;
   private dragging = false;
   private reduced: boolean;
-  private frozenTime = 0;
   private resolution = new THREE.Vector2(1, 1);
   private resizeObserver: ResizeObserver;
   private motionQuery: MediaQueryList;
@@ -206,48 +169,41 @@ export class Hologram {
     this.motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     this.reduced = this.motionQuery.matches;
     this.motionQuery.addEventListener("change", this.onMotionPreference);
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    this.renderer.setClearColor("#03070c", 1);
+    this.renderer.setClearColor(0, 0);
     this.canvas = this.renderer.domElement;
     this.canvas.className = "body-hologram-canvas";
+    this.canvas.style.visibility = "hidden";
+    this.canvas.addEventListener("webglcontextlost", event => {
+      event.preventDefault();
+      this.setPreview("fallback");
+    });
+    this.canvas.addEventListener("webglcontextrestored", () => this.showFittedBody());
     host.appendChild(this.canvas);
 
-    const uniforms = () => ({
-      time: { value: 0 },
-      motion: { value: this.reduced ? 0 : 1 },
-      intensity: { value: 1 },
-      base: { value: BASE.clone() },
-      hot: { value: HOT.clone() },
-      changed: { value: CHANGED.clone() },
-      span: { value: this.span },
-    });
-    this.bodyMaterial = new THREE.ShaderMaterial({
-      vertexShader: bodyVertex,
-      fragmentShader: bodyFragment,
-      uniforms: uniforms(),
-      transparent: true,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      depthFunc: THREE.LessEqualDepth,
-    });
+    this.bodyMaterial = new THREE.MeshStandardMaterial({ color: BASE, roughness: 0.58, vertexColors: true });
     this.ghostMaterial = new THREE.ShaderMaterial({
       vertexShader: bodyVertex,
       fragmentShader: ghostFragment,
-      uniforms: { ...uniforms(), base: { value: GHOST.clone() } },
+      uniforms: { base: { value: GHOST } },
       transparent: true,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
-    this.particleMaterial = new THREE.ShaderMaterial({
-      vertexShader: particleVertex,
-      fragmentShader: particleFragment,
-      uniforms: uniforms(),
-      transparent: true,
-      blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
 
+    // Studio light is fixed in the scene, so orbiting reveals the side and back contours.
+    const hemisphere = new THREE.HemisphereLight("#fff8f0", "#9e8f88", 1.42);
+    const key = new THREE.DirectionalLight("#fff4eb", 2.35);
+    key.position.set(-2.5, 3.4, 2.2);
+    const fill = new THREE.DirectionalLight("#edf2ff", 0.70);
+    fill.position.set(2.8, 1.5, 1.4);
+    const rim = new THREE.DirectionalLight("#d7ebf6", 1.42);
+    rim.position.set(0.2, 2.9, -2.8);
+    this.contact.rotation.x = -Math.PI / 2;
+    this.contact.visible = false;
+    this.scene.add(hemisphere, key, fill, rim, this.contact);
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.toneMappingExposure = 1.05;
     this.camera.position.set(0, 1, 4);
     this.controls = new OrbitControls(this.camera, this.canvas);
     this.controls.enableDamping = true;
@@ -261,12 +217,10 @@ export class Hologram {
     });
     this.controls.addEventListener("end", () => { this.dragging = false; });
 
-    this.composer = new EffectComposer(this.renderer);
-    this.composer.addPass(new RenderPass(this.scene, this.camera));
-    this.bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.32, 0.22, 0.3);
-    this.composer.addPass(this.bloom);
-    this.composer.addPass(new OutputPass());
     this.scene.add(this.paths);
+    const depthMesh = new THREE.Mesh(this.geometry, this.depthMaterial);
+    depthMesh.frustumCulled = false;
+    this.depthScene.add(depthMesh);
 
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(host);
@@ -278,40 +232,99 @@ export class Hologram {
     return this.dragging;
   }
 
-  setTopology(faces: Uint32Array, vertexCount: number, masks: Record<string, Uint8Array>) {
+  setTopology(faces: Uint32Array, vertexCount: number, masks: Record<string, Uint8Array>, surface?: SurfaceTopology) {
     this.masks = masks;
+    this.highlight = new Float32Array(vertexCount);
+    this.change = new Float32Array(vertexCount);
     const index = new THREE.BufferAttribute(faces, 1);
-    for (const g of [this.geometry, this.ghostGeometry]) {
-      g.setIndex(index);
-      g.setAttribute("position", new THREE.BufferAttribute(new Float32Array(vertexCount * 3), 3));
-      g.setAttribute("glow", new THREE.BufferAttribute(new Float32Array(vertexCount), 1));
-      g.setAttribute("change", new THREE.BufferAttribute(new Float32Array(vertexCount), 1));
+    for (const geometry of [this.geometry, this.ghostGeometry]) {
+      geometry.setIndex(index);
+      geometry.setAttribute("position", new THREE.BufferAttribute(new Float32Array(vertexCount * 3), 3));
     }
-    this.occluder = new THREE.Mesh(this.geometry, new THREE.MeshBasicMaterial({ colorWrite: false, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 2 }));
-    this.occluder.renderOrder = 0;
-    this.body = new THREE.Mesh(this.geometry, this.bodyMaterial);
-    this.body.renderOrder = 1;
+    this.surface = surface;
+    this.faces = new Uint32Array(faces);
     this.ghost = new THREE.Mesh(this.ghostGeometry, this.ghostMaterial);
+    this.ghost.frustumCulled = false;
     this.ghost.renderOrder = 2;
     this.ghost.visible = false;
-    for (const mesh of [this.occluder, this.body, this.ghost]) {
-      mesh.frustumCulled = false;
-      this.scene.add(mesh);
+    this.scene.add(this.ghost);
+    if (surface?.baseVertices) {
+      const signal = this.appearanceRequest.signal;
+      const indices = bodyAnchors(surface.baseVertices);
+      void loadHead(indices, signal).then(head => {
+        if (signal.aborted) {
+          head.forEach(part => part.dispose());
+          return;
+        }
+        this.head = head;
+        for (const part of head) {
+          part.mesh.visible = false;
+          this.scene.add(part.mesh);
+        }
+        if (this.target) this.updateHead(this.geometry.getAttribute("position").array as Float32Array);
+      }).catch(error => { if (!signal.aborted) console.error("Body Profile appearance", error); });
+      void loadOutfit(indices, signal).then(outfit => {
+        if (signal.aborted) { outfit.dispose(); return; }
+        this.outfit = outfit;
+        this.scene.add(outfit.mesh);
+        this.buildDressedBody();
+        this.showFittedBody();
+      }).catch(error => {
+        if (!signal.aborted) {
+          console.error("Body Profile outfit", error);
+          this.setPreview("fallback");
+        }
+      });
+    } else {
+      this.setPreview("fallback");
     }
   }
 
-  /** Morph to a newly fitted body; measurement lines follow once the shape has settled. */
+  /** A fitted body and its validated clothing are presented in the same frame. */
   setBody(vertices: Float32Array, paths: Record<string, BodyPath[]>) {
-    if (!this.body) return;
-    const position = this.geometry.getAttribute("position") as THREE.BufferAttribute;
-    const first = !this.target;
-    this.from = first ? vertices.slice() : (position.array as Float32Array).slice();
+    if (!this.geometry.getAttribute("position")) return;
     this.target = vertices;
-    this.pendingPaths = paths;
-    this.morph = first || this.reduced ? null : { start: performance.now(), duration: MORPH_MS };
-    if (!this.morph) this.applyMorph(1);
-    if (first) this.frameBody();
-    this.updateChange();
+    this.displayPaths = paths;
+    this.showFittedBody();
+  }
+
+  private setPreview(state: BodyPreview) {
+    this.canvas.style.visibility = state === "ready" ? "visible" : "hidden";
+    if (state === this.preview) return;
+    this.preview = state;
+    this.onPreview?.(state);
+  }
+
+  private buildDressedBody() {
+    if (!this.outfit) return;
+    const exposed: number[] = [], faceUV: number[] = [];
+    const covered = this.outfit.covered;
+    const atEdge = new Set<number>();
+    const uv = this.surface?.uv;
+    const sourceUV = this.surface?.faceUV;
+    for (let i = 0; i < this.faces.length; i += 3) {
+      const a = this.faces[i], b = this.faces[i + 1], c = this.faces[i + 2];
+      if (covered.has(a) && covered.has(b) && covered.has(c)) continue;
+      for (const vertex of [a, b, c]) if (covered.has(vertex)) atEdge.add(vertex);
+      exposed.push(a, b, c);
+      if (sourceUV) faceUV.push(sourceUV[i], sourceUV[i + 1], sourceUV[i + 2]);
+    }
+    // The asset's mask covers the chest, back and pelvis. Contact with hems is expected.
+    this.coverage = [...covered].filter(vertex => !atEdge.has(vertex)).filter((_, index) => index % 16 === 0);
+    if (uv && sourceUV) {
+      this.skin = skinGeometry(exposed, uv, faceUV);
+      applySkinTextures(this.bodyMaterial);
+    }
+    const visibleGeometry = this.skin?.geometry ?? new THREE.BufferGeometry();
+    if (!this.skin) {
+      visibleGeometry.setIndex(exposed);
+      visibleGeometry.setAttribute("position", this.geometry.getAttribute("position"));
+      visibleGeometry.setAttribute("color", new THREE.BufferAttribute(new Float32Array(this.highlight.length * 3), 3));
+    }
+    this.body = new THREE.Mesh(visibleGeometry, this.bodyMaterial);
+    this.body.frustumCulled = false;
+    this.scene.add(this.body);
+    this.updatePaint();
   }
 
   setGhost(vertices: Float32Array | null, changed: Record<string, number> = {}) {
@@ -324,18 +337,19 @@ export class Hologram {
 
   /** Highlight one parameter's region and measuring line, and turn the camera to it. */
   setFocus(pid: string | null, view: BodyView | null) {
-    if (pid === this.focus) return;
+    if (pid === this.focus && view === this.focusView) return;
     this.focus = pid;
-    const glow = this.geometry.getAttribute("glow") as THREE.BufferAttribute | undefined;
-    if (glow) {
-      this.glowFrom = (glow.array as Float32Array).slice();
+    this.focusView = view;
+    if (this.highlight.length) {
+      this.glowFrom = this.highlight.slice();
       const mask = pid ? this.masks[pid] : null;
-      this.glowTarget = new Float32Array(glow.count);
+      this.glowTarget = new Float32Array(this.highlight.length);
       if (mask) for (let i = 0; i < mask.length; i++) this.glowTarget[i] = mask[i] / 255;
       this.glowTween = this.reduced ? null : { start: performance.now(), duration: GLOW_MS };
       if (!this.glowTween) this.applyGlow(1);
     }
     this.styleLayers();
+    this.updateHairTape();
     if (!this.dragging) this.turnTo(pid && view ? this.viewFor(pid, view) : this.home);
   }
 
@@ -363,7 +377,7 @@ export class Hologram {
     let score = -Infinity;
     for (const p of candidates) {
       v.copy(p).project(camera);
-      if (v.z > 1) continue;
+      if (v.z < -1 || v.z > 1) continue;
       const x = rect.left + (v.x * 0.5 + 0.5) * rect.width;
       const y = rect.top + (-v.y * 0.5 + 0.5) * rect.height;
       const s = toward === "left" ? -x : toward === "right" ? x : -Math.hypot(x - (from?.x ?? 0), y - (from?.y ?? 0));
@@ -383,25 +397,31 @@ export class Hologram {
     this.clearLayers();
     this.geometry.dispose();
     this.ghostGeometry.dispose();
-    this.floor?.geometry.dispose();
-    this.particles?.geometry.dispose();
-    for (const m of [this.bodyMaterial, this.ghostMaterial, this.particleMaterial]) m.dispose();
-    this.composer.dispose();
+    this.appearanceRequest.abort();
+    this.head.forEach(part => part.dispose());
+    this.outfit?.dispose();
+    this.body?.geometry.dispose();
+    this.depthTarget.dispose();
+    this.depthMaterial.dispose();
+    this.bodyMaterial.map?.dispose();
+    this.bodyMaterial.bumpMap?.dispose();
+    this.contact.geometry.dispose();
+    this.contact.material.dispose();
+    for (const m of [this.bodyMaterial, this.ghostMaterial]) m.dispose();
     this.renderer.dispose();
     this.canvas.remove();
   }
 
   private onMotionPreference = () => {
     this.reduced = this.motionQuery.matches;
-    for (const m of [this.bodyMaterial, this.particleMaterial]) m.uniforms.motion.value = this.reduced ? 0 : 1;
   };
 
   private resize() {
     const { clientWidth: w, clientHeight: h } = this.host;
     if (!w || !h) return;
     this.renderer.setSize(w, h, false);
-    this.composer.setSize(w, h);
-    this.bloom.setSize(w, h);
+    this.renderer.getDrawingBufferSize(this.depthViewport);
+    this.depthTarget.setSize(this.depthViewport.x, this.depthViewport.y);
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
     this.resolution.set(w, h);
@@ -411,13 +431,6 @@ export class Hologram {
 
   private tick = () => {
     const now = performance.now();
-    if (!this.reduced) this.frozenTime = this.clock.getElapsedTime();
-    for (const m of [this.bodyMaterial, this.particleMaterial]) m.uniforms.time.value = this.frozenTime;
-    if (this.morph) {
-      const t = Math.min(1, (now - this.morph.start) / this.morph.duration);
-      this.applyMorph(ease(t));
-      if (t >= 1) this.morph = null;
-    }
     if (this.glowTween) {
       const t = Math.min(1, (now - this.glowTween.start) / this.glowTween.duration);
       this.applyGlow(ease(t));
@@ -425,48 +438,88 @@ export class Hologram {
     }
     if (this.cameraTween && this.cameraFrom && this.cameraTo) {
       const t = ease(Math.min(1, (now - this.cameraTween.start) / this.cameraTween.duration));
-      this.camera.position.lerpVectors(this.cameraFrom.position, this.cameraTo.position, t);
-      this.controls.target.lerpVectors(this.cameraFrom.target, this.cameraTo.target, t);
+      const frame = orbitFrame(this.cameraFrom, this.cameraTo, t, this.minimumCameraRadius());
+      this.camera.position.copy(frame.position);
+      this.controls.target.copy(frame.target);
       if (t >= 1) this.cameraTween = null;
     }
-    if (!this.reduced) {
-      for (const layer of this.layers) {
-        const material = layer.line.material as LineMaterial;
-        if (material.dashed) material.dashOffset -= 0.0009;
-      }
-    }
     this.controls.update();
-    this.composer.render();
+    if (this.preview !== "ready") return;
+    if (this.focus || this.layers.some(layer => layer.reference)) {
+      this.renderer.setRenderTarget(this.depthTarget);
+      this.renderer.render(this.depthScene, this.camera);
+      this.renderer.setRenderTarget(null);
+    }
+    this.renderer.render(this.scene, this.camera);
     this.onFrame?.();
   };
 
-  private applyMorph(t: number) {
-    if (!this.from || !this.target) return;
-    const position = this.geometry.getAttribute("position") as THREE.BufferAttribute;
-    const out = position.array as Float32Array;
-    for (let i = 0; i < out.length; i++) out[i] = this.from[i] + (this.target[i] - this.from[i]) * t;
+  private showFittedBody() {
+    const out = this.target;
+    if (!out || !this.body || !this.outfit || this.renderer.getContext().isContextLost()) return;
+    // Never paint the new vertices until the matching opaque outfit passes coverage.
+    const position = this.geometry.getAttribute("position");
+    if (out.length !== position.count * 3 || !out.every(Number.isFinite)) {
+      this.setPreview("fallback");
+      return;
+    }
+    (position.array as Float32Array).set(out);
     position.needsUpdate = true;
     this.geometry.computeVertexNormals();
-    if (t >= 1 && this.pendingPaths) {
-      this.buildLayers(this.pendingPaths);
-      this.pendingPaths = null;
+    const normal = this.geometry.getAttribute("normal").array as Float32Array;
+    this.outfit.update(out, normal);
+    if (!this.outfit.covers(out, normal, this.coverage)) {
+      this.setPreview("fallback");
+      return;
     }
+    if (this.skin) {
+      const skinPosition = this.skin.geometry.getAttribute("position");
+      const skinNormal = this.skin.geometry.getAttribute("normal");
+      this.skin.vertices.forEach((vertex, i) => {
+        const j = vertex * 3;
+        skinPosition.setXYZ(i, out[j], out[j + 1], out[j + 2]);
+        skinNormal.setXYZ(i, normal[j], normal[j + 1], normal[j + 2]);
+      });
+      skinPosition.needsUpdate = true;
+      skinNormal.needsUpdate = true;
+    }
+    if (!this.skin) this.body.geometry.setAttribute("normal", this.geometry.getAttribute("normal"));
+    this.updateContact(out);
+    this.buildLayers(this.displayPaths);
+    this.updateHead(out);
+    this.updateChange();
+    const first = !this.home;
+    this.frameBody(first);
+    if (first && this.focus && this.focusView) this.turnTo(this.viewFor(this.focus, this.focusView));
+    this.setPreview("ready");
   }
 
   private applyGlow(t: number) {
     if (!this.glowFrom || !this.glowTarget) return;
-    const glow = this.geometry.getAttribute("glow") as THREE.BufferAttribute;
-    const out = glow.array as Float32Array;
-    for (let i = 0; i < out.length; i++) out[i] = this.glowFrom[i] + (this.glowTarget[i] - this.glowFrom[i]) * t;
-    glow.needsUpdate = true;
+    for (let i = 0; i < this.highlight.length; i++) {
+      this.highlight[i] = THREE.MathUtils.lerp(this.glowFrom[i], this.glowTarget[i], t);
+    }
+    this.updatePaint();
   }
 
-  /** The ghost stands to the current height; the glow marks parameters whose recorded value changed. */
+  private updatePaint() {
+    const attribute = (this.skin?.geometry ?? this.geometry).getAttribute("color");
+    if (!attribute) return;
+    const neutral = new THREE.Color(0xffffff);
+    const changed = new THREE.Color("#b79aff");
+    const color = new THREE.Color();
+    for (let i = 0; i < attribute.count; i++) {
+      const vertex = this.skin?.vertices[i] ?? i;
+      color.copy(neutral).lerp(changed, this.change[vertex] * 0.58)
+        .multiplyScalar(1 + this.highlight[vertex] * 0.30);
+      attribute.setXYZ(i, color.r, color.g, color.b);
+    }
+    attribute.needsUpdate = true;
+  }
+
+  /** Match the saved comparison mesh to the current floor and height. */
   private updateChange() {
-    const change = this.geometry.getAttribute("change") as THREE.BufferAttribute | undefined;
-    if (!change) return;
-    const out = change.array as Float32Array;
-    out.fill(0);
+    this.change.fill(0);
     if (this.target && this.ghostTarget && this.ghost) {
       const position = this.ghostGeometry.getAttribute("position") as THREE.BufferAttribute;
       (position.array as Float32Array).set(standTo(this.ghostTarget, this.target));
@@ -475,10 +528,39 @@ export class Hologram {
       for (const [pid, weight] of Object.entries(this.changed)) {
         const mask = this.masks[pid];
         if (!mask || weight <= 0) continue;
-        for (let i = 0; i < mask.length; i++) out[i] = Math.max(out[i], (mask[i] / 255) * weight);
+        for (let i = 0; i < mask.length; i++) this.change[i] = Math.max(this.change[i], (mask[i] / 255) * weight);
       }
     }
-    change.needsUpdate = true;
+    this.updatePaint();
+  }
+
+  private updateHead(body: Float32Array) {
+    this.head.forEach(part => part.update(body));
+    this.updateHairTape();
+  }
+
+  private updateHairTape() {
+    const ring = this.layers.find(layer => layer.pid === "B01");
+    const line = ring?.line.geometry.getAttribute("instanceStart");
+    const height = this.focus === "B01" && line?.count ? line.getY(0) : undefined;
+    this.head.forEach(part => part.focusTape(height));
+  }
+
+  private updateContact(body: Float32Array) {
+    const floor = heightRange(body).min;
+    const feet: THREE.Vector2[] = this.contact.material.uniforms.feet.value;
+    const samples = [0, 0];
+    feet.forEach(foot => foot.set(0, 0));
+    for (let i = 0; i < body.length; i += 3) {
+      if (body[i + 1] > floor + 0.04) continue;
+      const side = body[i] < 0 ? 0 : 1;
+      feet[side].x += body[i];
+      feet[side].y += body[i + 2];
+      samples[side]++;
+    }
+    feet.forEach((foot, side) => foot.divideScalar(samples[side] || 1));
+    this.contact.position.y = floor - 0.003;
+    this.contact.visible = true;
   }
 
   private buildLayers(paths: Record<string, BodyPath[]>) {
@@ -491,23 +573,17 @@ export class Hologram {
         if (pts.length < 2) continue;
         const geometry = new LineGeometry();
         geometry.setPositions(pts.flat());
-        const material = new LineMaterial({
-          color: (path.below_floor ? CHANGED : reference ? BASE : HOT).getHex(),
-          linewidth: reference ? 1.6 : 2.6,
-          transparent: true,
-          blending: THREE.AdditiveBlending,
-          depthWrite: false,
-          dashed: !reference,
-          dashSize: 0.014,
-          gapSize: 0.006,
-          worldUnits: false,
-        });
+        const material = measurementLine(this.depthTarget.depthTexture!, this.depthViewport, this.camera);
+        material.color.copy(path.below_floor ? CHANGED : reference ? BASE : HOT);
+        material.linewidth = reference ? 1.6 : 2.6;
         material.resolution.copy(this.resolution);
         const line = new Line2(geometry, material);
         line.computeLineDistances();
         line.renderOrder = 3;
         this.paths.add(line);
-        this.layers.push({ pid, line, reference });
+        const marks = path.landmarks?.length ? measurementLandmarks(path.landmarks, material.color) : undefined;
+        if (marks) this.paths.add(marks);
+        this.layers.push({ pid, line, reference, marks });
       }
     }
     this.styleLayers();
@@ -517,7 +593,8 @@ export class Hologram {
     for (const layer of this.layers) {
       const material = layer.line.material as LineMaterial;
       const active = layer.pid === this.focus;
-      layer.line.visible = active || layer.reference;
+      layer.line.visible = active || layer.reference || (this.focus === "E05" && layer.pid === "E01");
+      if (layer.marks) layer.marks.visible = active;
       material.opacity = active ? 1 : 0.4;
       material.linewidth = active ? (layer.reference ? 2.4 : 2.8) : 1.4;
     }
@@ -528,6 +605,11 @@ export class Hologram {
       layer.line.geometry.dispose();
       (layer.line.material as LineMaterial).dispose();
       this.paths.remove(layer.line);
+      if (layer.marks) {
+        layer.marks.geometry.dispose();
+        layer.marks.material.dispose();
+        this.paths.remove(layer.marks);
+      }
     }
     this.layers = [];
   }
@@ -565,7 +647,7 @@ export class Hologram {
     const box = this.bounds();
     const size = box.getSize(new THREE.Vector3());
     const centre = box.getCenter(new THREE.Vector3());
-    this.span.set(box.min.y, box.max.y);
+    this.bodyRadius = Math.hypot(size.x * 0.5, size.z * 0.5);
     const vertical = size.y * 1.26 / (2 * Math.tan(THREE.MathUtils.degToRad(FOV / 2)));
     const horizontal = vertical * Math.max(1, 0.62 / this.camera.aspect);
     const distance = Math.max(vertical, horizontal);
@@ -573,51 +655,11 @@ export class Hologram {
       position: new THREE.Vector3(0, centre.y + size.y * 0.03, distance),
       target: new THREE.Vector3(0, centre.y - size.y * 0.01, 0),
     };
-    this.ensureStage(box);
     if (instant || !this.cameraTo) {
       this.camera.position.copy(this.home.position);
       this.controls.target.copy(this.home.target);
       this.cameraTween = null;
     }
-  }
-
-  private ensureStage(box: THREE.Box3) {
-    if (this.floor) return;
-    const size = box.getSize(new THREE.Vector3());
-    const radius = Math.max(size.x, size.z) * 0.6 + 0.15;
-    const floor = new THREE.Mesh(
-      new THREE.PlaneGeometry(radius * 2, radius * 2),
-      new THREE.ShaderMaterial({
-        vertexShader: floorVertex,
-        fragmentShader: floorFragment,
-        uniforms: { base: { value: BASE.clone() } },
-        transparent: true,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-      }),
-    );
-    floor.rotation.x = -Math.PI / 2;
-    floor.position.y = box.min.y - 0.002;
-    this.floor = floor;
-    this.scene.add(floor);
-
-    const count = 900;
-    const positions = new Float32Array(count * 3);
-    const phase = new Float32Array(count);
-    for (let i = 0; i < count; i++) {
-      const a = Math.random() * Math.PI * 2;
-      const r = 0.18 + Math.pow(Math.random(), 0.6) * radius * 0.8;
-      positions[i * 3] = Math.cos(a) * r;
-      positions[i * 3 + 1] = 0;
-      positions[i * 3 + 2] = Math.sin(a) * r;
-      phase[i] = Math.random();
-    }
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute("phase", new THREE.BufferAttribute(phase, 1));
-    this.particles = new THREE.Points(geometry, this.particleMaterial);
-    this.particles.frustumCulled = false;
-    this.scene.add(this.particles);
   }
 
   private viewFor(pid: string, view: BodyView) {
@@ -631,10 +673,11 @@ export class Hologram {
     const close = view === "head" || view === "hand";
     const homeDistance = this.home.position.distanceTo(this.home.target);
     const distance = close
-      ? Math.max(0.75, extent * 4.6)
+      ? Math.max(view === "head" ? 0.75 : 0.38, extent * 4.3)
       : Math.min(homeDistance, Math.max(homeDistance * 0.62, extent * 2.6));
     const target = close ? centre : new THREE.Vector3(centre.x * 0.5, THREE.MathUtils.lerp(this.home.target.y, centre.y, 0.6), 0);
-    const position = target.clone().add(VIEW_DIRECTION[view].clone().normalize().multiplyScalar(distance));
+    const position = target.clone().add(VIEW_DIRECTION[view].clone().normalize()
+      .multiplyScalar(Math.max(distance, this.minimumCameraRadius())));
     return { position, target };
   }
 
@@ -653,6 +696,10 @@ export class Hologram {
       out.push(new THREE.Vector3(x, position.getY(i), position.getZ(i)));
     }
     return out;
+  }
+
+  private minimumCameraRadius() {
+    return Math.max(this.controls.minDistance, this.bodyRadius + this.camera.near + 0.08);
   }
 
   private turnTo(goal: { position: THREE.Vector3; target: THREE.Vector3 } | null) {

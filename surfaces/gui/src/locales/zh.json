@@ -1821,8 +1821,8 @@
     "measured_on": "测量日期",
     "save_revision": "保存修订",
     "discard": "放弃修订",
-    "ghost": "幽灵对比：{{date}} · 变化部位以粉色发光",
-    "clear_ghost": "清除幽灵对比",
+    "ghost": "与 {{date}} 的人体轮廓对比",
+    "clear_ghost": "退出轮廓对比",
     "close": "关闭",
     "model_loading": "正在载入人体模型…",
     "model_error": "人体模型载入失败：{{error}}",
@@ -1843,7 +1843,7 @@
     "shortfall_short": "人体模型达不到这个数值",
     "shortfall": "人体模型{{side}}最多只能做到 {{reached}} cm，与采用值相差 {{gap}} cm。采用值照常保存。",
     "reference_unset": "未设定",
-    "inferred": "推断",
+    "inferred": "模型估计",
     "left_wrist": "左腕",
     "right_wrist": "右腕",
     "kind": {
@@ -1861,7 +1861,7 @@
     "position_placeholder": "例如：喉结下方，自然站立",
     "note": "备注",
     "mirrored": "镜像 {{value}}",
-    "inferred_value": "推断 {{value}}",
+    "inferred_value": "模型估计 {{value}} cm",
     "range": "有效范围 {{min}}–{{max}}"
   }
 }

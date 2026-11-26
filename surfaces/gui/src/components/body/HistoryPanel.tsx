@@ -31,7 +31,7 @@ export function HistoryPanel({
   onFocus: (pid: string) => void;
   onClose: () => void;
 }) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(undefined, { lng: "zh" });
   const [revisions, setRevisions] = useState<Record<string, BodyRevision[] | "loading">>({});
   const ordered = [...snapshots].sort((a, b) => b.measured_on.localeCompare(a.measured_on) || b.created_at.localeCompare(a.created_at));
   const chronological = [...ordered].reverse();
