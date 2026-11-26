@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   createBodySnapshot,
@@ -20,7 +20,7 @@ import {
   type BodyValues,
 } from "../api";
 import { Icon } from "./Icon";
-import { GarmentPlate, inView, type AtlasView } from "./body/GarmentPlate";
+import { inView, type AtlasView } from "./body/GarmentPlate";
 import { BodyStage } from "./body/BodyStage";
 import { HistoryPanel } from "./body/HistoryPanel";
 import { ParameterCard, ParameterLabel } from "./body/ParameterCard";
@@ -60,10 +60,11 @@ export function BodyView() {
   const [busy, setBusy] = useState(false);
   const savedDraft = useRef<BodyValues | null>(null);
   const hoverTimer = useRef<number>();
+  const detailId = useId();
 
   const values = editing ? editing.values : draft;
   const ready = status.state === "ready";
-  const focus = pinned ?? hovered;
+  const focus = hovered ?? pinned;
 
   const fail = useCallback((cause: unknown) => {
     setProblem(cause instanceof Error ? cause.message : String(cause));
@@ -144,6 +145,8 @@ export function BodyView() {
     return () => { live = false; };
   }, [ghostId, ready, fail]);
 
+  useEffect(() => () => window.clearTimeout(hoverTimer.current), []);
+
   const change = (pid: string, key: string, value: number | string | null) => {
     if (editing) setEditing({ ...editing, values: setEntry(editing.values, pid, key, value) });
     else setDraft(d => setEntry(d ?? {}, pid, key, value));
@@ -153,6 +156,11 @@ export function BodyView() {
     window.clearTimeout(hoverTimer.current);
     if (pid === null) setHovered(null);
     else hoverTimer.current = window.setTimeout(() => setHovered(pid), HOVER_DWELL);
+  };
+
+  const selectParameter = (pid: string | null) => {
+    hover(null);
+    setPinned(pid);
   };
 
   const refreshSnapshots = async () => setSnapshots((await getBodyProfile()).snapshots);
@@ -208,9 +216,9 @@ export function BodyView() {
 
   const parameters = catalog?.parameters ?? [];
   const visible = useMemo(() => (catalog?.parameters ?? []).filter(p => inView(p.id, view)), [catalog, view]);
+  const selected = visible.find(p => p.id === pinned);
   const selectView = (next: AtlasView) => {
-    window.clearTimeout(hoverTimer.current);
-    setHovered(null);
+    hover(null);
     if (pinned && !inView(pinned, next)) setPinned(null);
     setView(next);
   };
@@ -229,34 +237,37 @@ export function BodyView() {
         ghost={ghost}
         ghostChanges={ghostSnapshot && values ? changes(parameters, values, ghostSnapshot.values) : {}}
         focus={focus}
-        expanded={pinned}
+        selected={selected?.id ?? null}
         landmarks={view === "裤装" ? ["E05", "E08", "H09", "H13"] :
           view === "上装" ? ["B07", "C08", "E01", "F12"] : ["C03", "C08", "E08", "H13"]}
-        onSelect={setPinned}
+        onSelect={selectParameter}
         onHover={hover}
-        onDismiss={() => setPinned(null)}
+        onDismiss={() => selectParameter(null)}
         label={(p, open) => (
-          <>
-            <ParameterLabel
-              parameter={p}
-              entry={values?.[p.id]}
-              render={render}
-              open={open}
-              lang={lang}
-              onToggle={() => setPinned(current => (current === p.id ? null : p.id))}
-            />
-            {open && catalog && (
-              <ParameterCard
-                parameter={p}
-                catalog={catalog}
-                entry={values?.[p.id]}
-                render={render}
-                lang={lang}
-                onChange={(key, value) => change(p.id, key, value)}
-                onClose={() => setPinned(null)}
-              />
-            )}
-          </>
+          <ParameterLabel
+            parameter={p}
+            entry={values?.[p.id]}
+            render={render}
+            open={open}
+            detailId={detailId}
+            lang={lang}
+            onToggle={() => selectParameter(open ? null : p.id)}
+          />
+        )}
+        details={selected && catalog && (
+          <ParameterCard
+            key={selected.id}
+            id={detailId}
+            parameter={selected}
+            catalog={catalog}
+            entry={values?.[selected.id]}
+            render={render}
+            lang={lang}
+            view={view}
+            onView={selectView}
+            onChange={(key, value) => change(selected.id, key, value)}
+            onClose={() => selectParameter(null)}
+          />
         )}
       >
         <header className="body-header">
@@ -287,7 +298,6 @@ export function BodyView() {
             onClick={() => selectView(tab)}>{tab}</button>)}
           <span>量体单位 · cm</span>
         </nav>
-        <GarmentPlate view={view} active={parameters.find(p => p.id === focus)} onView={selectView}/>
         {editing && (
           <div className="body-banner" role="status">
             <span>{t("body.editing", { date: snapshots.find(s => s.id === editing.id)?.measured_on })}</span>
@@ -319,12 +329,16 @@ export function BodyView() {
             snapshots={snapshots}
             ghost={ghostId}
             editing={editing?.id ?? null}
-            focus={focus}
+            focus={pinned}
             lang={lang}
             onGhost={setGhostId}
             onRevise={s => { setEditing({ id: s.id, measured_on: s.measured_on, values: s.values }); setHistory(false); }}
             onDelete={s => setDialog({ kind: "delete", snapshot: s })}
-            onFocus={pid => { if (!inView(pid, view)) selectView("全身总览"); setPinned(pid); }}
+            onFocus={pid => {
+              if (!inView(pid, view)) selectView("全身总览");
+              selectParameter(pid);
+              setHistory(false);
+            }}
             onClose={() => setHistory(false)}
           />
         )}

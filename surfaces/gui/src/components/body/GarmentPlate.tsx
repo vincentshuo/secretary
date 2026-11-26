@@ -55,17 +55,16 @@ export function GarmentFallback({ active, view, message }: {
   </section>;
 }
 
-export function GarmentPlate({ view, active, onView }: { view: AtlasView; active?: BodyParameter; onView: (v: AtlasView) => void }) {
-  const showShirt = view === "上装" || (view === "全身总览" && (!active || shirt.includes(active.id)));
-  const showPants = view === "裤装" || (view === "全身总览" && (!active || trousers.includes(active.id)));
-  return <section className="atlas-plate" aria-label="服装用途">
-    <div className="atlas-flats">
-      {showShirt && <button onClick={() => onView("上装")} aria-label="查看上装量体"><Flat pants={false} back={active?.view === "back"} focus={active?.id}/></button>}
-      {showPants && <button onClick={() => onView("裤装")} aria-label="查看裤装量体"><Flat pants back={false} focus={active?.id}/></button>}
-    </div>
-    <div className="atlas-caption"><h3>{active?.name.zh ?? (view === "全身总览" ? "服装量体图册" : view + "量体")}</h3>
-      <p>{active?.how ?? "选择量体项目，查看软尺路径与服装对应部位。"}</p>
-      {active && <p>{active.use}</p>}
-    </div>
+export function GarmentPlate({ view, active, onView }: { view: AtlasView; active: BodyParameter; onView: (v: AtlasView) => void }) {
+  const showShirt = view !== "裤装" && shirt.includes(active.id);
+  const showPants = view !== "上装" && trousers.includes(active.id);
+  return <section className="atlas-plate" aria-label="怎么量">
+    <h4>怎么量</h4>
+    {(showShirt || showPants) && <div className="atlas-flats">
+      {showShirt && <button type="button" onClick={() => onView("上装")} aria-label="查看上装量体"><Flat pants={false} back={active.view === "back"} focus={active.id}/></button>}
+      {showPants && <button type="button" onClick={() => onView("裤装")} aria-label="查看裤装量体"><Flat pants back={false} focus={active.id}/></button>}
+    </div>}
+    <p>{active.how}</p>
+    <p>{active.use}</p>
   </section>;
 }

@@ -9,7 +9,7 @@ import { decodeBase64 } from "./values";
 const LABEL_HEIGHT = 46;
 const LABEL_GAP = 6;
 const MARGIN_TOP = 138;
-const MARGIN_BOTTOM = 165;
+const MARGIN_BOTTOM = 22;
 const NARROW = 1320;
 
 const floats = (text: string) => new Float32Array(decodeBase64(text).buffer);
@@ -36,8 +36,9 @@ export function BodyStage({
   ghost,
   ghostChanges,
   focus,
-  expanded,
+  selected,
   label,
+  details,
   landmarks,
   onSelect,
   onHover,
@@ -52,8 +53,9 @@ export function BodyStage({
   ghost: BodyRender | null;
   ghostChanges: Record<string, number>;
   focus: string | null;
-  expanded: string | null;
+  selected: string | null;
   label: (p: BodyParameter, open: boolean) => ReactNode;
+  details: ReactNode;
   landmarks: string[];
   onSelect: (id: string) => void;
   onHover: (pid: string | null) => void;
@@ -132,9 +134,17 @@ export function BodyStage({
   }, [ghost, changeKey]);
 
   useEffect(() => {
-    const p = focus ? byId.current[focus] : null;
-    hologram.current?.setFocus(focus, p?.view ?? null);
+    hologram.current?.setFocus(focus);
   }, [focus]);
+
+  const selectedView = selected ? byId.current[selected]?.view ?? null : null;
+  useEffect(() => {
+    hologram.current?.setSelection(selected, selectedView);
+  }, [selected, selectedView]);
+
+  useLayoutEffect(() => {
+    if (narrow && selected) labels.current[selected]?.scrollIntoView({ block: "nearest" });
+  }, [narrow, selected]);
 
   useLayoutEffect(() => {
     const h = hologram.current;
@@ -190,8 +200,14 @@ export function BodyStage({
   return (
     <div
       ref={stage}
-      className={`body-stage${narrow ? " is-narrow" : ""}${focus ? " has-focus" : ""}`}
-      onKeyDown={event => { if (event.key === "Escape") onDismiss(); }}
+      className={`body-stage${narrow ? " is-narrow" : ""}${selected ? " has-details" : ""}${focus ? " has-focus" : ""}`}
+      onKeyDown={event => {
+        if (event.key !== "Escape" || !selected) return;
+        if (event.target instanceof HTMLElement && event.target.closest(".body-card")) {
+          labels.current[selected]?.querySelector("button")?.focus({ preventScroll: true });
+        }
+        onDismiss();
+      }}
     >
       <div className="atlas-grid" aria-hidden="true"><GridLines distance={28} lineColor="#86837b" horizontalLineDash={[]} verticalLineDash={[]}/></div>
       <div className="atlas-frame" aria-hidden="true"><FrameCorners animated={false} cornerLength={17} strokeWidth={1.3}/></div>
@@ -220,30 +236,25 @@ export function BodyStage({
         if (!p) return null;
         return <button type="button" key={id} ref={el => { tags.current[id] = el; }}
           data-side={i % 2 ? "right" : "left"} style={{ top: (17 + i * 19) + "%" }}
-          onClick={() => { onSelect(id); labels.current[id]?.scrollIntoView({block:"nearest"}); }}>
+          onClick={() => onSelect(id)}>
           <small>{id}</small>{p.name.zh}
         </button>;
       })}</div>}
       {children}
       <div className={narrow ? "body-list" : "body-columns"}>
         {parameters.map(p => {
-          const open = expanded === p.id;
+          const open = selected === p.id;
           const top = positions?.[p.id];
-          const flip = !narrow && top !== undefined && top > size.height * 0.56;
-          const style = narrow || top === undefined
-            ? undefined
-            : flip
-              ? { bottom: size.height - top - LABEL_HEIGHT }
-              : { top };
           return (
             <div
               key={p.id}
               ref={el => { labels.current[p.id] = el; }}
-              className={`body-label column-${p.column}${open ? " is-open" : ""}${p.id === focus ? " is-active" : ""}${flip ? " is-flipped" : ""}`}
-              style={style}
+              className={`body-label column-${p.column}${open ? " is-active" : ""}`}
+              style={narrow ? undefined : { top }}
               onPointerEnter={() => onHover(p.id)}
               onPointerLeave={() => onHover(null)}
-              onFocus={() => onHover(p.id)}
+              onFocus={event => { if (event.target.matches(":focus-visible")) onHover(p.id); }}
+              onBlur={() => onHover(null)}
               data-testid={`body-label-${p.id}`}
             >
               {label(p, open)}
@@ -251,6 +262,7 @@ export function BodyStage({
           );
         })}
       </div>
+      {details}
     </div>
   );
 }

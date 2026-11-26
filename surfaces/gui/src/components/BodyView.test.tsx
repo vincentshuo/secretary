@@ -18,7 +18,11 @@ const api = vi.hoisted(() => ({
 }));
 vi.mock("../api", () => api);
 
-const hologram = vi.hoisted(() => ({ focus: [] as (string | null)[], ghosts: [] as (Record<string, number> | null)[] }));
+const hologram = vi.hoisted(() => ({
+  focus: [] as (string | null)[],
+  selection: [] as (string | null)[],
+  ghosts: [] as (Record<string, number> | null)[],
+}));
 vi.mock("./body/hologram", () => ({
   Hologram: class {
     canvas = document.createElement("canvas");
@@ -27,6 +31,7 @@ vi.mock("./body/hologram", () => ({
     setBody() {}
     setGhost(v: Float32Array | null, changed: Record<string, number>) { hologram.ghosts.push(v ? changed : null); }
     setFocus(pid: string | null) { hologram.focus.push(pid); }
+    setSelection(pid: string | null) { hologram.selection.push(pid); }
     anchor() { return null; }
     homeAnchor() { return null; }
     dispose() {}
@@ -54,6 +59,7 @@ class Observer { observe() {} disconnect() {} }
 beforeEach(() => {
   vi.stubGlobal("ResizeObserver", Observer);
   hologram.focus = [];
+  hologram.selection = [];
   hologram.ghosts = [];
   api.getBodyCatalog.mockResolvedValue(catalog);
   api.getBodyStatus.mockResolvedValue({ state: "ready", fitter: "test" });
@@ -72,7 +78,7 @@ afterEach(() => {
 
 const openCard = async (name: RegExp) => {
   fireEvent.click(await screen.findByRole("button", { name }));
-  return screen.findByRole("group");
+  return screen.findByRole("complementary");
 };
 
 describe("BodyView", () => {
@@ -95,12 +101,35 @@ describe("BodyView", () => {
     expect(api.saveBodyDraft).not.toHaveBeenCalled();
   });
 
-  it("explains a measurement from the guide behind the question mark", async () => {
+  it("previews on hover and opens one side panel on selection", async () => {
     render(<BodyView />);
+    const chest = await screen.findByTestId("body-label-C08");
+    const thigh = await screen.findByTestId("body-label-H09");
+    fireEvent.pointerEnter(chest);
+    await waitFor(() => expect(hologram.focus.at(-1)).toBe("C08"));
+    expect(hologram.selection).toEqual([null]);
+    expect(screen.queryByRole("complementary")).toBeNull();
+
     const card = await openCard(/C08 胸围/);
-    fireEvent.click(within(card).getByRole("button", { name: "测量说明" }));
+    expect(within(chest).queryByRole("textbox")).toBeNull();
     expect(within(card).getByText("经胸部最丰满处水平绕一圈。")).toBeTruthy();
-    expect(within(card).getByText("水平截面。")).toBeTruthy();
+    expect(within(card).getByText("水平截面。").closest("details")?.open).toBe(false);
+    fireEvent.click(within(card).getByText("测量细节"));
+    expect(within(card).getByText("水平截面。").closest("details")?.open).toBe(true);
+
+    fireEvent.pointerLeave(chest);
+    fireEvent.pointerEnter(thigh);
+    await waitFor(() => expect(hologram.focus.at(-1)).toBe("H09"));
+    expect(hologram.selection.at(-1)).toBe("C08");
+    expect(screen.getByRole("complementary", { name: "胸围" })).toBe(card);
+
+    fireEvent.click(within(thigh).getByRole("button"));
+    const next = screen.getByRole("complementary", { name: "大腿最大围" });
+    expect(screen.getAllByRole("complementary")).toEqual([next]);
+    expect(hologram.selection.at(-1)).toBe("H09");
+    expect(within(next).getByText("垂直于大腿轴线。").closest("details")?.open).toBe(false);
+    fireEvent.click(within(next).getByRole("button", { name: "关闭" }));
+    expect(screen.queryByRole("complementary")).toBeNull();
   });
 
   it("saves a dated snapshot of the draft", async () => {
@@ -118,9 +147,14 @@ describe("BodyView", () => {
     api.getBodyProfile.mockResolvedValue({ draft: { values: { C08: { value: 100 } }, updated_at: "x" }, snapshots: [snapshot] });
     render(<BodyView />);
     fireEvent.click(await screen.findByRole("button", { name: /历史/ }));
-    const panel = await screen.findByRole("complementary", { name: "历史" });
+    let panel = await screen.findByRole("complementary", { name: "历史" });
     fireEvent.click(within(panel).getByRole("button", { name: "对比" }));
     await waitFor(() => expect(hologram.ghosts.at(-1)).toEqual({ C08: 1 }));
+    fireEvent.click(within(panel).getByRole("button", { name: /C08 胸围/ }));
+    expect(screen.queryByRole("complementary", { name: "历史" })).toBeNull();
+    expect(screen.getByRole("complementary", { name: "胸围" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: /历史/ }));
+    panel = await screen.findByRole("complementary", { name: "历史" });
     fireEvent.click(within(panel).getByRole("button", { name: "删除 2026-01-05 的快照" }));
     const dialog = await screen.findByRole("dialog");
     expect(api.deleteBodySnapshot).not.toHaveBeenCalled();

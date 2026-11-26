@@ -12,6 +12,7 @@ const HOT = new THREE.Color("#c25c35");
 const CHANGED = new THREE.Color("#be5875");
 const GHOST = new THREE.Color("#9c83c8");
 const FOV = 28;
+const PREVIEW_ZOOM = 0.88;
 const GLOW_MS = 260;
 const CAMERA_MS = 900;
 
@@ -157,7 +158,8 @@ export class Hologram {
   private cameraTween: Tween | null = null;
   private home: { position: THREE.Vector3; target: THREE.Vector3 } | null = null;
   private focus: string | null = null;
-  private focusView: BodyView | null = null;
+  private selection: string | null = null;
+  private selectionView: BodyView | null = null;
   private bodyRadius = 0;
   private dragging = false;
   private reduced: boolean;
@@ -205,6 +207,7 @@ export class Hologram {
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.05;
     this.camera.position.set(0, 1, 4);
+    this.camera.zoom = PREVIEW_ZOOM;
     this.controls = new OrbitControls(this.camera, this.canvas);
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.08;
@@ -335,11 +338,10 @@ export class Hologram {
     this.updateChange();
   }
 
-  /** Highlight one parameter's region and measuring line, and turn the camera to it. */
-  setFocus(pid: string | null, view: BodyView | null) {
-    if (pid === this.focus && view === this.focusView) return;
+  /** Highlight one parameter's region and measuring line. */
+  setFocus(pid: string | null) {
+    if (pid === this.focus) return;
     this.focus = pid;
-    this.focusView = view;
     if (this.highlight.length) {
       this.glowFrom = this.highlight.slice();
       const mask = pid ? this.masks[pid] : null;
@@ -350,6 +352,12 @@ export class Hologram {
     }
     this.styleLayers();
     this.updateHairTape();
+  }
+
+  setSelection(pid: string | null, view: BodyView | null) {
+    if (pid === this.selection && view === this.selectionView) return;
+    this.selection = pid;
+    this.selectionView = view;
     if (!this.dragging) this.turnTo(pid && view ? this.viewFor(pid, view) : this.home);
   }
 
@@ -426,7 +434,7 @@ export class Hologram {
     this.camera.updateProjectionMatrix();
     this.resolution.set(w, h);
     for (const layer of this.layers) (layer.line.material as LineMaterial).resolution.copy(this.resolution);
-    if (this.home && !this.focus && !this.dragging) this.frameBody(true);
+    if (this.home && !this.selection && !this.dragging) this.frameBody(true);
   }
 
   private tick = () => {
@@ -490,7 +498,7 @@ export class Hologram {
     this.updateChange();
     const first = !this.home;
     this.frameBody(first);
-    if (first && this.focus && this.focusView) this.turnTo(this.viewFor(this.focus, this.focusView));
+    if (first && this.selection && this.selectionView) this.turnTo(this.viewFor(this.selection, this.selectionView));
     this.setPreview("ready");
   }
 

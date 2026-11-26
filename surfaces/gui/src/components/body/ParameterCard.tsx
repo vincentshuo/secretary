@@ -1,7 +1,8 @@
-import { useEffect, useId, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { BodyCatalog, BodyEntry, BodyField, BodyParameter, BodyRender } from "../../api";
 import { Icon } from "../Icon";
+import { GarmentPlate, type AtlasView } from "./GarmentPlate";
 import { bilateral, formatCm, parseField, readings, recorded, shortfall, type Reading } from "./values";
 
 type Lang = "zh" | "en";
@@ -11,6 +12,7 @@ export function ParameterLabel({
   entry,
   render,
   open,
+  detailId,
   lang,
   onToggle,
 }: {
@@ -18,6 +20,7 @@ export function ParameterLabel({
   entry: BodyEntry | undefined;
   render: BodyRender | null;
   open: boolean;
+  detailId: string;
   lang: Lang;
   onToggle: () => void;
 }) {
@@ -25,7 +28,7 @@ export function ParameterLabel({
   const shown = readings(p, entry, render, lang);
   const gap = shortfall(p, render);
   return (
-    <button type="button" className="body-label-head" aria-expanded={open} onClick={onToggle}>
+    <button type="button" className="body-label-head" aria-expanded={open} aria-controls={open ? detailId : undefined} onClick={onToggle}>
       <span className="body-label-id">{p.id}</span>
       <span className="body-label-name">{p.name[lang]}</span>
       <span className="body-label-value">
@@ -71,44 +74,42 @@ function Summary({ parameter: p, shown, entry }: { parameter: BodyParameter; sho
 }
 
 export function ParameterCard({
+  id,
   parameter: p,
   catalog,
   entry,
   render,
   lang,
+  view,
+  onView,
   onChange,
   onClose,
 }: {
+  id: string;
   parameter: BodyParameter;
   catalog: BodyCatalog;
   entry: BodyEntry | undefined;
   render: BodyRender | null;
   lang: Lang;
+  view: AtlasView;
+  onView: (view: AtlasView) => void;
   onChange: (key: string, value: number | string | null) => void;
   onClose: () => void;
 }) {
   const { t } = useTranslation(undefined, { lng: "zh" });
-  const [help, setHelp] = useState(false);
   const shown = readings(p, entry, render, lang);
   const gap = shortfall(p, render);
-  const helpId = useId();
+  const titleId = `${id}-title`;
   return (
-    <div className="body-card" role="group" aria-label={p.name[lang]} onClick={event => event.stopPropagation()}>
+    <aside id={id} className="body-card" aria-labelledby={titleId}>
       <div className="body-card-top">
+        <h3 id={titleId}>{p.name[lang]}</h3>
+        <button type="button" className="body-icon-button" aria-label={t("body.close")} onClick={onClose}><Icon name="x" size={16} /></button>
+      </div>
+      <div className="body-card-kinds">
         <span className={`body-kind kind-${p.kind}`}>{t(`body.kind.${p.kind}`)}</span>
         {p.as_needed && <span className="body-kind">{t("body.as_needed")}</span>}
-        <span className="flex-1" />
-        <button
-          type="button"
-          className={`body-help-toggle${help ? " is-on" : ""}`}
-          aria-expanded={help}
-          aria-controls={helpId}
-          aria-label={t("body.help")}
-          onClick={() => setHelp(v => !v)}
-        >?</button>
-        <button type="button" className="body-icon-button" aria-label={t("body.close")} onClick={onClose}><Icon name="x" size={14} /></button>
       </div>
-      {help && <Help id={helpId} parameter={p} catalog={catalog} />}
       {p.side_choice && (
         <div className="body-segment" role="radiogroup" aria-label={t("body.watch_side")}>
           {(["L", "R"] as const).map(side => (
@@ -139,7 +140,12 @@ export function ParameterCard({
       )}
       <TextField label={t("body.position")} placeholder={t("body.position_placeholder")} value={(entry?.position as string) ?? ""} onCommit={v => onChange("position", v)} />
       <TextField label={t("body.note")} value={(entry?.note as string) ?? ""} onCommit={v => onChange("note", v)} multiline />
-    </div>
+      <GarmentPlate view={view} active={p} onView={onView} />
+      <details className="body-help" lang="zh">
+        <summary>测量细节</summary>
+        <Help parameter={p} catalog={catalog} />
+      </details>
+    </aside>
   );
 }
 
@@ -214,17 +220,9 @@ function TextField({ label, value, placeholder, multiline, onCommit }: {
   );
 }
 
-function Help({ id, parameter: p, catalog }: { id: string; parameter: BodyParameter; catalog: BodyCatalog }) {
+function Help({ parameter: p, catalog }: { parameter: BodyParameter; catalog: BodyCatalog }) {
   return (
-    <div id={id} className="body-help" lang="zh">
-      <section>
-        <h4>怎么量</h4>
-        <p>{p.how}</p>
-      </section>
-      <section>
-        <h4>购物用途</h4>
-        <p>{p.use}</p>
-      </section>
+    <div className="body-help-content">
       {p.categories.length > 0 && (
         <section>
           <h4>适用品类</h4>
